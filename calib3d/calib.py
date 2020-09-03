@@ -46,10 +46,6 @@ class Point3D(HomogeneousCoordinatesPoint):
 class Point2D(HomogeneousCoordinatesPoint):
     coord_names = ("x","y")
 
-class PointNotFoundException(Exception):
-    pass
-
-
 class Calib():
     def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, kc=np.zeros((5,1)), **_) -> None:
         self.width = np.int(width)
