@@ -8,7 +8,7 @@ setup(
     licence="LGPL",
     python_requires='>=3.6',
     description="Python 3D calibration and homogenous coordinates computation library",
-    version='1.0.1',
+    version='1.0.2',
     packages=find_packages(),
     install_requires=["numpy", "opencv-python"],
 )
