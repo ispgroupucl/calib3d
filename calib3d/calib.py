@@ -106,7 +106,9 @@ class Calib():
 
     def project_3D_to_2D(self, point3D: Point3D):
         assert isinstance(point3D, Point3D), "Wrong argument type '{}'. Expected {}".format(type(point3D), Point3D)
-        point2D = Point2D(self.P @ point3D.H)
+        point2D_H = self.P @ point3D.H
+        point2D_H[2] = point2D_H[2] * np.sign(point2D_H[2]) # correct projection of points being projected behind the camera
+        point2D = Point2D(point2D_H)
         # avoid distortion of points too far away
         excluded_points = np.logical_or(np.logical_or(point2D.x < -self.width, point2D.x > 2*self.width),
                                         np.logical_or(point2D.y < -self.height, point2D.y > 2*self.height))
