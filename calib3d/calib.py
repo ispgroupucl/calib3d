@@ -9,7 +9,8 @@ class HomogeneousCoordinatesPoint(np.ndarray):
             "                       or shape ({},N) in homogenous coordinates".format(len(cls.coord_names), len(cls.coord_names)+1)
         if len(coords) == 1:
             coords = coords[0]
-        array = np.array([coords]).T if isinstance(coords, tuple) else coords
+        array = np.array(coords) if isinstance(coords, tuple) else coords
+        array = array if len(array.shape) == 2 else array[..., np.newaxis]
         assert len(array.shape) == 2, invalid_shape_message
         if array.shape[0] == len(cls.coord_names): # point(s) given in non-homogenous coordinates
             pass
