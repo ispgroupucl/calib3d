@@ -70,6 +70,11 @@ class Calib():
         return self.__class__(**{**self.dict, **kwargs})
 
     @classmethod
+    def from_P(cls, P, width, height):
+        K, R, T, Rx, Ry, Rz, angles = cv2.decomposeProjectionMatrix(P) # pylint: disable=unused-variable
+        return cls(K=K, R=R, T=Point3D(-R@Point3D(T)), width=width, height=height)
+
+    @classmethod
     def load(cls, filename):
         """ Loads a Calib object from a file (using the pickle library)
             Argument:
