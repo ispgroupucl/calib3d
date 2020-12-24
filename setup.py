@@ -10,5 +10,8 @@ setup(
     description="Python 3D calibration and homogenous coordinates computation library",
     version='2.0.0',
     packages=find_packages(),
-    install_requires=["numpy", "opencv-python"],
+    install_requires=[
+        "numpy",
+        "opencv-python"
+    ],
 )
