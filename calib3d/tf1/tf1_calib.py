@@ -1,6 +1,6 @@
 import cv2
 import tensorflow as tf
-
+from calib3d import Calib
 # pylint: disable=unexpected-keyword-arg, no-value-for-parameter, too-many-function-args
 
 class TensorflowCalib():
@@ -22,7 +22,7 @@ class TensorflowCalib():
         self.batch_size = K.shape[0]
         self.dtype = dtype
     @classmethod
-    def from_numpy(cls, calib, dtype=tf.float64):
+    def from_numpy(cls, calib: Calib, dtype=tf.float64):
         return cls(
             K=tf.constant(calib.K, dtype=dtype)[tf.newaxis],
             r=tf.constant(cv2.Rodrigues(calib.R)[0], dtype=dtype)[tf.newaxis],
