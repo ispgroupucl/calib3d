@@ -67,9 +67,13 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
     z = property(fget=lambda self: self.get_coord(2), fset=lambda self, value: self.set_coord(2, value))
 
 class Point3D(HomogeneousCoordinatesPoint):
+    """ Numpy representation of a single 3D point or a list of 3D points
+    """
     coord_names = ("x","y","z")
 
 class Point2D(HomogeneousCoordinatesPoint):
+    """ Numpy representation of a single 2D point or a list of 2D points
+    """
     coord_names = ("x","y")
 
 class Calib():
