@@ -6,7 +6,10 @@ import cv2
 class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
     def __new__(cls, *coords):
         if len(coords) == 1:
-            coords = coords[0]
+            if isinstance(coords, list):
+                coords = np.hstack(coords)
+            else:
+                coords = coords[0]
         array = np.array(coords) if isinstance(coords, (tuple, list)) else coords
         invalid_shape_message = "Invalid input shape:\n" \
             "Expected a 2D np.array of shape ({l1},N) or (N,{l1},1) in non-homogenous coordinates\n" \
