@@ -1,2 +1,3 @@
-calib3d.egg-info
-calib3d/__pycache__
+*.egg-info
+**/__pycache__
+dist
