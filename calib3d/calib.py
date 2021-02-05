@@ -224,7 +224,7 @@ class Calib():
         point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
         point3D_c.x += length3D # add the 3D length to one of the componant
         point2D = self.distort(Point2D(self.K @ point3D_c)) # go in the 2D world
-        return np.linalg.norm(point2D - self.project_3D_to_2D(point3D))
+        return np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=-1)
 
     def projects_in(self, point3D):
         point2D = self.project_3D_to_2D(point3D)
