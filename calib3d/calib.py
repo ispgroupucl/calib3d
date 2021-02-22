@@ -51,7 +51,7 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
 
     def to_list(self):
         assert self.shape[1] == 1, "to_list() method can only be used on single point {}".format(self.__class__.__name__)
-        return self[:,0].flatten()
+        return self[:,0].flatten().tolist()
 
     def flatten(self):
         return np.array(super().flatten())
