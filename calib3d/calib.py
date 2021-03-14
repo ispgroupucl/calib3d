@@ -221,6 +221,8 @@ class Calib():
         return self.update(K=A@self.K, width=new_width, height=new_height)
 
     def compute_length2D(self, length3D: int, point3D: Point3D):
+        """ Returns the length in pixel of a 3D length at point3D
+        """
         point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
         point3D_c.x += length3D # add the 3D length to one of the componant
         point2D = self.distort(Point2D(self.K @ point3D_c)) # go in the 2D world
