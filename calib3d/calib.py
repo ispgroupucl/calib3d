@@ -59,8 +59,16 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
     def to_int_tuple(self):
         return tuple(int(x) for x in self.to_list())
 
-    get_coord = lambda self, i:        super().__getitem__((i,0))        if self.shape[1] == 1 else super().__getitem__(i)
-    set_coord = lambda self, i, value: super().__setitem__((i,0), value) if self.shape[1] == 1 else super().__setitem__((i), value)
+    def linspace(self, num):
+        return np.transpose(np.linspace(self[:,:-1], self[:,1:], num), axes=(1,2,0)).reshape(3,-1)
+
+    def close(self):
+        # TODO: add Points2D and Points3D classes
+        assert self.shape[1] > 1
+        return self.__class__(np.hstack((self, self[:,0:1])))
+
+    get_coord = lambda self, i:        np.array(super().__getitem__((i,0)))        if self.shape[1] == 1 else np.array(super().__getitem__(i))
+    set_coord = lambda self, i, value: np.array(super().__setitem__((i,0), value)) if self.shape[1] == 1 else np.array(super().__setitem__((i), value))
 
     x = property(fget=lambda self: self.get_coord(0), fset=lambda self, value: self.set_coord(0, value))
     y = property(fget=lambda self: self.get_coord(1), fset=lambda self, value: self.set_coord(1, value))
