@@ -9,6 +9,6 @@ python setup.py sdist
 twine upload dist/calib3d-$RELEASE_NUM.tar.gz
 
 # Tag in Git and push to remote
-git tag $RELEASE_NUM -m "Tagging release $RELEASE_NUM"
-git push --tags
+git tag -f $RELEASE_NUM -m "Tagging release $RELEASE_NUM"
+git push -f --tags
 
