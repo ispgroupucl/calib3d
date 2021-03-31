@@ -47,7 +47,7 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
 
     # /!\ iter may conflict with numpy array getitem.
     def __iter__(self):
-        return (self.__class__(self[:,i]) for i in range(self.shape[1]))
+        return (self.__class__(self[:,i:i+1]) for i in range(self.shape[1]))
 
     def to_list(self):
         assert self.shape[1] == 1, "to_list() method can only be used on single point {}".format(self.__class__.__name__)
