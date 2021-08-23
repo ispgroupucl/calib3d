@@ -86,8 +86,8 @@ class Point2D(HomogeneousCoordinatesPoint):
 
 class Calib():
     def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, kc=np.zeros((5,1)), **_) -> None:
-        self.width = np.int(width)
-        self.height = np.int(height)
+        self.width = int(width)
+        self.height = int(height)
         self.T = T
         self.K = K
         self.kc = np.array(kc, dtype=np.float64)
