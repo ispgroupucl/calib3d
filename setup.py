@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
+    version='2.2.1',
     name='calib3d',
     author='Gabriel Van Zandycke',
     author_email="gabriel.vanzandycke@hotmail.com",
@@ -8,7 +9,6 @@ setup(
     licence="LGPL",
     python_requires='>=3.6',
     description="Python 3D calibration and homogenous coordinates computation library",
-    version='2.2.0',
     packages=find_packages(),
     install_requires=[
         "numpy",
