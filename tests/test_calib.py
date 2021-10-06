@@ -99,3 +99,11 @@ def test_projection():
     points2D = calib.project_3D_to_2D(points3D)
     assert np.all(points2D - np.array([[128.950, 1895.195], [782.928, 968.128]]) < 1.0e-2) # 0.01 pixel error projection
     assert np.all(calib.project_2D_to_3D(points2D, Z=0) - points3D < 1.0e-2) # 0.01 cm error reprojection on image border
+
+def test_compute_length():
+    calib = Calib(K=K, R=R, kc=kc, T=T, width=width, height=height)
+    point3D = Point3D(1400,750,0)
+    margin3D = 100 #cm
+    margin2D = calib.compute_length2D(margin3D, point3D)
+    assert np.isscalar(margin2D)
+    assert margin2D - 107.677886 < EPS

@@ -28,6 +28,8 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
             pass
         elif array.shape[0] == len(cls.coord_names)+1: # point(s) given in homogenous coordinates
             array = array[0:len(cls.coord_names),:]/array[len(cls.coord_names),:]
+        elif array.shape[0] == 0: # point given from an empty list should be an empty point
+            array = np.empty((len(cls.coord_names),0))
         else:
             raise ValueError(invalid_shape_message)
         return array.astype(np.float64).view(cls)
@@ -228,13 +230,15 @@ class Calib():
         A, new_width, new_height = compute_rotate(self.width, self.height, angle)
         return self.update(K=A@self.K, width=new_width, height=new_height)
 
-    def compute_length2D(self, length3D: int, point3D: Point3D):
+    def compute_length2D(self, length3D: float, point3D: Point3D):
         """ Returns the length in pixel of a 3D length at point3D
         """
+        assert np.isscalar(length3D), f"This function expects a scalar `length3D` argument. Received {length3D}"
         point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
         point3D_c.x += length3D # add the 3D length to one of the componant
         point2D = self.distort(Point2D(self.K @ point3D_c)) # go in the 2D world
-        return np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=0)
+        length = np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=0)
+        return length#float(length) if point3D.shape[1] == 1 else length
 
     def projects_in(self, point3D):
         point2D = self.project_3D_to_2D(point3D)
@@ -291,8 +295,35 @@ def compute_rotate(width, height, angle):
 
 def rotate_image(image, angle):
     """ Rotates an image around its center by the given angle (in degrees).
-    The returned image will be large enough to hold the entire new image, with a black background
+        The returned image will be large enough to hold the entire new image, with a black background
     """
     height, width = image.shape[0:2]
     A, new_width, new_height = compute_rotate(width, height, angle)
     return cv2.warpAffine(image, A[0:2,:], (new_width, new_height), flags=cv2.INTER_LINEAR)
+
+def parameters_to_affine_transform(angle, x_slice, y_slice, output_shape, do_flip=False):
+    """ Compute the affine transformation matrix that correspond to a
+        - horizontal flip, followed by a
+        - rotation of `angle` degrees, followed by a
+        - crop, followed by a
+        - scale
+    """
+    assert not do_flip, "There is a bug with random flip"
+    R = np.eye(3)
+    center = ((y_slice.start + y_slice.stop)/2, (x_slice.start + x_slice.stop)/2)
+    R[0:2,:] = cv2.getRotationMatrix2D(center, angle, 1.0)
+
+    x0 = x_slice.start
+    y0 = y_slice.start
+    width = x_slice.stop - x_slice.start
+    height = y_slice.stop - y_slice.start
+    T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
+
+    sx = output_shape[0]/width
+    sy = output_shape[1]/height
+    S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
+
+    f = np.random.randint(0,2)*2-1 if do_flip else 1 # random sample in {-1,1}
+    F = np.array([[f, 0, 0], [0, 1, 0], [0, 0, 1]])
+
+    return S@T@R@F
