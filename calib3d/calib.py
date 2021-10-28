@@ -242,9 +242,8 @@ class Calib():
 
     def projects_in(self, point3D):
         point2D = self.project_3D_to_2D(point3D)
-        if point2D.x > 0 and point2D.y > 0 and point2D.x < self.width and point2D.y < self.height:
-            return True
-        return False
+        cond = np.stack((point2D.x > 0, point2D.y > 0, point2D.x < self.width, point2D.y < self.height))
+        return np.all(cond, axis=0)
 
 def find_intersection(C: Point3D, d, P: Point3D, n):
     """ Finds the intersection between a line and a plane.
