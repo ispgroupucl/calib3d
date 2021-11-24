@@ -69,8 +69,8 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
         assert self.shape[1] > 1, f"Invalid use of 'close' method: points' shape '{self.shape}' expected to be > 1 in the second dimension"
         return self.__class__(np.hstack((self, self[:,0:1])))
 
-    get_coord = lambda self, i:        np.array(super().__getitem__((i,0)))        if self.shape[1] == 1 else np.array(super().__getitem__(i))
-    set_coord = lambda self, i, value: np.array(super().__setitem__((i,0), value)) if self.shape[1] == 1 else np.array(super().__setitem__((i), value))
+    get_coord = lambda self, i:        np.asarray(super().__getitem__((i,0)))       if self.shape[1] == 1 else np.asarray(super().__getitem__(i))
+    set_coord = lambda self, i, value:            super().__setitem__((i,0), value) if self.shape[1] == 1 else            super().__setitem__((i), value)
 
     x = property(fget=lambda self: self.get_coord(0), fset=lambda self, value: self.set_coord(0, value))
     y = property(fget=lambda self: self.get_coord(1), fset=lambda self, value: self.set_coord(1, value))
