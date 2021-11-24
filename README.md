@@ -5,7 +5,7 @@ This library offers several tools to ease manipulation of camera calibration, pr
 
 ## 2D and 3D points implementation
 
-The vector used to represent 2D and 3D points are _vertical_ vectors, which are stored as 2D matrices in `numpy`. Furthemore, in _homogenous_ coordinates: a 3D point $(x,y,z)$ in the world is represented by a 4 element vector $\left[\lambda x,\lambda y,\lambda z,\lambda \right]^T$ where $\lambda \in \mathbb{R}_0$.
+The vector used to represent 2D and 3D points are _vertical_ vectors, which are stored as 2D matrices in `numpy`. Furthemore, in _homogenous_ coordinates: a 3D point ![x,y,z](https://latex.codecogs.com/svg.latex?x,y,z) in the world is represented by a 4 element vector $\left[\lambda x,\lambda y,\lambda z,\lambda \right]^T$ where $\lambda \in \mathbb{R}_0$.
 
 To simplify access to $x$ and $y$ (and $z$) coordinates of those points as well as computations in homogenous coordinates, we defined the objects `Point2D` (and `Point3D`) extending `numpy.ndarray`. Therefore, access to $y$ coordinate of `point` is `point.y` instead of `point[1][0]` (`point[1][:]` for an array of points), and access to homogenous coordinates is made easy with `point.H`, while it is still possible to use `point` with any `numpy` operators.
 
