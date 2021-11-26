@@ -33,6 +33,8 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
         else:
             raise ValueError(invalid_shape_message)
         return array.astype(np.float64).view(cls)
+    # def __array_wrap__(self, out_arr, context=None):
+    #     return super().__array_wrap__(self, out_arr, context)
     @property
     @abstractproperty
     def coord_names(self):
@@ -56,7 +58,7 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
         return self[:,0].flatten().tolist()
 
     def flatten(self):
-        return np.array(super().flatten())
+        return np.asarray(super().flatten())
 
     def to_int_tuple(self):
         return tuple(int(x) for x in self.to_list())

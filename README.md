@@ -17,7 +17,7 @@ The construction of such point is made convenient with multiple ways of building
  - `Point2D(x, y)`
  - `Point2D(l*x, l*y, l)`
 
-This construction handles arrays of points where the components are `numpy.ndarray`, `list` or `tuple`.
+This also handles arrays of points where the components are `numpy.ndarray`, `list` or `tuple`.
 
 The construction can also be made from `numpy` arrays of dimensions ![`(D,N)`](https://render.githubusercontent.com/render/math?math=(D,N)) or ![`(D+1,N)`](https://render.githubusercontent.com/render/math?math=(D%2B1,N)) in homogenous coordinates where ![`D in {2,3}`](https://render.githubusercontent.com/render/math?math=D\in\\\{2,3\\\}) is the space dimension and ![`N in N`](https://render.githubusercontent.com/render/math?math=N\in\mathbb{N}) is the number of points (which can be 0 for an empty set of points). Example:
 ```
@@ -53,3 +53,13 @@ Point2D([[6.],
 >>> np.linalg.norm(point)
 2.23606797749979
 ```
+
+## Camera calibration
+
+This section is a work in progress
+
+This library implements a `Calib` object that, given the intrinsic and extrinsic parameters of a camera
+
+The _camera_ coordinates system is therefore a transformation of the _world_ coordinates systems with:
+- A **rotation** defined by a rotation matrix $R$ using euler angles in a right-hand orthogonal system. The rotation is applied to the world coordinates system to obtain the camera orientation.
+- A **translation** defined by a translation vector $T$ representing the position of the center of the world in the camera coordinates system !
