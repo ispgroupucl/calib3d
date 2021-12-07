@@ -335,6 +335,7 @@ def compute_rotation_matrix(point3D: Point3D, camera3D: Point3D):
     """ Computes the rotation matrix of a camera in `camera3D` pointing
         towards the point `point3D`. Both are expressed in word coordinates.
         The convention is that Z is pointing down.
+        Credits: François Ledent
     """
     point3D = camera3D - point3D
     x, y, z = point3D.x, point3D.y, point3D.z
