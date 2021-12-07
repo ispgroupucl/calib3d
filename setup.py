@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import calib3d
 
 setup(
-    version=calib3d.__version__,
+    version="2.2.6",
     name='calib3d',
     author='Gabriel Van Zandycke',
     author_email="gabriel.vanzandycke@hotmail.com",
