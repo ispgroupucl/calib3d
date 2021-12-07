@@ -244,7 +244,7 @@ class Calib():
 
     def projects_in(self, point3D):
         point2D = self.project_3D_to_2D(point3D)
-        cond = np.stack((point2D.x > 0, point2D.y > 0, point2D.x < self.width, point2D.y < self.height))
+        cond = np.stack((point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width, point2D.y <= self.height))
         return np.all(cond, axis=0)
 
 def find_intersection(C: Point3D, d, P: Point3D, n):
@@ -302,12 +302,13 @@ def rotate_image(image, angle):
     A, new_width, new_height = compute_rotate(width, height, angle)
     return cv2.warpAffine(image, A[0:2,:], (new_width, new_height), flags=cv2.INTER_LINEAR)
 
-def parameters_to_affine_transform(angle, x_slice, y_slice, output_shape, do_flip=False):
+def parameters_to_affine_transform(angle: float, x_slice: slice, y_slice: slice,
+    output_shape: tuple, do_flip: bool=False):
     """ Compute the affine transformation matrix that correspond to a
-        - horizontal flip, followed by a
-        - rotation of `angle` degrees, followed by a
-        - crop, followed by a
-        - scale
+        - horizontal flip if `do_flip` is `True`, followed by a
+        - rotation of `angle` degrees around image center, followed by a
+        - crop defined by `x_slice` and `y_slice`, followed by a
+        - scale to recover `output_shape`.
     """
     assert not do_flip, "There is a bug with random flip"
     R = np.eye(3)
@@ -328,3 +329,26 @@ def parameters_to_affine_transform(angle, x_slice, y_slice, output_shape, do_fli
     F = np.array([[f, 0, 0], [0, 1, 0], [0, 0, 1]])
 
     return S@T@R@F
+
+
+def compute_rotation_matrix(point3D: Point3D, camera3D: Point3D):
+    """ Computes the rotation matrix of a camera in `camera3D` pointing
+        towards the point `point3D`. Both are expressed in word coordinates.
+        The convention is that Z is pointing down.
+    """
+    point3D = camera3D - point3D
+    x, y, z = point3D.x, point3D.y, point3D.z
+    d = np.sqrt(x**2 + y**2)
+    D = np.sqrt(x**2 + y**2 + z**2)
+    h = d / D
+    l = z / D
+
+    # camera basis `B` expressed in the world basis `O`
+    _x = np.array([y / d, -x / d, 0])
+    _y = np.array([- l * x / d, - l * y / d, h])
+    _z = np.array([- h * x / d, - h * y / d, -l])
+    B = np.stack((_x, _y, _z), axis=-1)
+
+    # `O = R @ B` (where `O` := `np.identity(3)`)
+    R = B.T # inv(B) == B.T since R is a rotation matrix
+    return R
