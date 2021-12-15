@@ -1,7 +1,7 @@
 # Python camera calibration and projective geometry library
 
 This library offers several tools to ease manipulation of camera calibration, projective geometry and computations using homogenous coordinates. 
-In a nutshell, this library provides implementation for 
+
 1. [2D and 3D points implementation](#2D-and-3D-points-implementation)
 2. [Camera calibration](#Camera-calibration)
 
@@ -66,3 +66,9 @@ The `Calib` object requires the camera matirx `K`, the rotation matrix `R`, the 
 The _camera_ coordinates system is therefore a transformation of the _world_ coordinates systems with:
 - A **rotation** defined by a rotation matrix $R$ using euler angles in a right-hand orthogonal system. The rotation is applied to the world coordinates system to obtain the camera orientation.
 - A **translation** defined by a translation vector $T$ representing the position of the center of the world in the camera coordinates system !
+
+
+## Reference
+
+This library is developed and maintained by [Gabriel Van Zandycke](https://github.com/gabriel-vanzandycke). If you use this repository, please consider citing my work.
+
