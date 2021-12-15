@@ -7,8 +7,6 @@ class Calib():
     def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, kc=None, **_) -> None:
         """ Represents a calibrated camera.
 
-        $$\frac{x}{y}$$
-
         Args:
             width (int): image width
             height (int): image height

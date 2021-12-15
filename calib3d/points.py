@@ -2,12 +2,20 @@ from abc import ABCMeta, abstractproperty
 import numpy as np
 
 class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
-    """ Generic homogenous coordinates points implementation for `Point2D` and `Point3D` objects.
+    """ Extension of Numpy `np.ndarray` that implements generic homogenous coordinates points
+        for `Point2D` and `Point3D` objects. The constructor supports multiple formats for creation
+        of a single point or array of multiple points.
 
-        Attributes:
-            D (int) : spatial dimention (2 for `Point2D` and 3 for `Point3D`)
-
-        Methods:
+        Example with creation of `Point2D` objects, all formulations are equivalent:
+        ```
+        >>> x, y = 1, 2
+        >>> Point2D(x, y)
+        >>> Point2D(4*x, 4*y, 4)
+        >>> Point2D(np.array([[x], [y]]))
+        >>> Point2D(4*np.array([[x], [y], [1]]))
+        Point2D([[1.],
+                 [2.]])
+        ```
     """
     def __new__(cls, *coords):
         if len(coords) == 1:
@@ -45,6 +53,10 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
     def _coord_names(self):
         raise NotImplementedError
 
+    x = property(fget=lambda self: self._get_coord(0), fset=lambda self, value: self._set_coord(0, value), doc="Point's x component")
+    y = property(fget=lambda self: self._get_coord(1), fset=lambda self, value: self._set_coord(1, value), doc="Point's y component")
+    z = property(fget=lambda self: self._get_coord(2), fset=lambda self, value: self._set_coord(2, value), doc="Point's z component (only valid for `Point3D` objects)")
+
     @property
     def H(self):
         """ Point expressed in homogenous coordinates with an homogenous component equal to `1`.
@@ -72,12 +84,10 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
 
     # /!\ iter may conflict with numpy array getitem.
     def __iter__(self):
-        """ Iterate over the points
-        """
         return (self.__class__(self[:,i:i+1]) for i in range(self.shape[1]))
 
     def to_list(self):
-        """ Transform a single point to a python list.
+        """ Transforms a single point to a python list.
 
         Raises:
             AssertionError if the object is an array of multiple points
@@ -120,11 +130,6 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
 
     _get_coord = lambda self, i:        np.asarray(super().__getitem__((i,0)))       if self.shape[1] == 1 else np.asarray(super().__getitem__(i))
     _set_coord = lambda self, i, value:            super().__setitem__((i,0), value) if self.shape[1] == 1 else            super().__setitem__((i), value)
-
-    x = property(fget=lambda self: self._get_coord(0), fset=lambda self, value: self._set_coord(0, value), doc="Point's x component")
-    y = property(fget=lambda self: self._get_coord(1), fset=lambda self, value: self._set_coord(1, value), doc="Point's y component")
-    z = property(fget=lambda self: self._get_coord(2), fset=lambda self, value: self._set_coord(2, value), doc="Point's z component (only valid for `Point3D` objects)")
-
 
 class Point3D(HomogeneousCoordinatesPoint):
     """ Numpy representation of a single 3D point or a list of 3D points
