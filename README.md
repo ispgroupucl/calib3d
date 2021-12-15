@@ -1,9 +1,10 @@
 # Python camera calibration and projective geometry library
 
-This library offers several tools to ease manipulation of camera calibration, projective geometry and computations using homogenous coordinates.
+This library offers several tools to ease manipulation of camera calibration, projective geometry and computations using homogenous coordinates. Full API documentation is available in [here](https://ispgroupucl.github.io/calib3d).
 
-Full API documentation is available in [here](https://ispgroupucl.github.io/calib3d).
-
+In a nutshell, this library provides implementation for 
+1. [2D and 3D points implementation](#2D-and-3D-points-implementation)
+2. [Camera calibration](#Camera-calibration)
 
 ## 2D and 3D points implementation
 
