@@ -7,25 +7,27 @@ class Calib():
     def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, kc=None, **_) -> None:
         """ Represents a calibrated camera.
 
+        $$\frac{x}{y}$$
+
         Args:
             width (int): image width
             height (int): image height
             T (np.ndarray): translation vector
             R (np.ndarray): rotation matrix
             K (np.ndarray): camera matrix holding intrinsic parameters
-            kc ([np.ndarray], optional): lens distortion coefficients. Defaults to None.
+            kc (np.ndarray, optional): lens distortion coefficients. Defaults to None.
         """
         self.width = int(width)
         self.height = int(height)
         self.T = T
         self.K = K
-        self.kc = np.array(kc or [0,0,0,0,0], dtype=np.float64)
+        self.kc = np.array((kc if kc is not None else [0,0,0,0,0]), dtype=np.float64)
         self.R = R
         self.C = Point3D(-R.T@T)
         self.P = self.K @ np.hstack((self.R, self.T))
         self.Pinv = np.linalg.pinv(self.P)
         self.Kinv = np.linalg.pinv(self.K)
-    def update(self, **kwargs):
+    def update(self, **kwargs) -> 'Calib':
         """ Creates another Calib object with the given keyword arguments updated
             Args:
                 **kwargs : Any of the arguments of `Calib`. Other arguments remain unchanged.
@@ -35,18 +37,20 @@ class Calib():
         return self.__class__(**{**self.dict, **kwargs})
 
     @classmethod
-    def from_P(cls, P, width, height):
+    def from_P(cls, P, width, height) -> 'Calib':
         """ Create a `Calib` object from a given projection matrix `P` and image dimensions `width` and `height`.
             Args:
                 P (np.ndarray) : a 3x4 projection matrix
                 width (int) : image width
                 height (int) : image height
+            Returns:
+                A Calib object
         """
         K, R, T, Rx, Ry, Rz, angles = cv2.decomposeProjectionMatrix(P) # pylint: disable=unused-variable
         return cls(K=K, R=R, T=Point3D(-R@Point3D(T)), width=width, height=height)
 
     @classmethod
-    def load(cls, filename):
+    def load(cls, filename) -> 'Calib':
         """ Loads a Calib object from a file (using the pickle library)
             Args:
                 filename (str) : the file that stores the Calib object
@@ -57,12 +61,12 @@ class Calib():
             return cls(**pickle.load(f))
 
     @property
-    def dict(self):
+    def dict(self) -> dict:
         """ Gets a dictionnary representing the calib object (allowing easier serialization)
         """
         return {k: getattr(self, k) for k in self.__dict__}
 
-    def dump(self, filename):
+    def dump(self, filename) -> None:
         """ Saves the current calib object to a file (using the pickle library)
             Args:
                 filename (str) : the file that will store the calib object
@@ -70,11 +74,11 @@ class Calib():
         with open(filename, "wb") as f:
             pickle.dump(self.dict, f)
 
-    def project_3D_to_2D_cv2(self, point3D: Point3D):
+    def _project_3D_to_2D_cv2(self, point3D: Point3D):
         raise BaseException("This function gives errors when rotating the calibration...")
         return Point2D(cv2.projectPoints(point3D, cv2.Rodrigues(self.R)[0], self.T, self.K, self.kc.astype(np.float64))[0][:,0,:].T)
 
-    def project_3D_to_2D(self, point3D: Point3D):
+    def project_3D_to_2D(self, point3D: Point3D) -> Point2D:
         """ Using the calib object, project a 3D point in the 2D image space.
             Args:
                 point3D (Point3D) : the 3D point to be projected
@@ -90,7 +94,7 @@ class Calib():
                                         np.logical_or(point2D.y < -self.height, point2D.y > 2*self.height))
         return Point2D(np.where(excluded_points, point2D, self.distort(point2D)))
 
-    def project_2D_to_3D(self, point2D: Point2D, Z: float):
+    def project_2D_to_3D(self, point2D: Point2D, Z: float) -> Point3D:
         """ Using the calib object, project a 2D point in the 3D image space.
             Args:
                 point2D (Point2D) : the 2D point to be projected
@@ -106,12 +110,6 @@ class Calib():
 
     def distort(self, point2D: Point2D) -> Point2D:
         """ Applies lens distortions to the given `point2D`.
-
-        Args:
-            point2D (Point2D): 
-
-        Returns:
-            Point2D: `Point2D` in the image space.
         """
         if np.any(self.kc):
             rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
@@ -131,13 +129,7 @@ class Calib():
         return point2D
 
     def rectify(self, point2D: Point2D) -> Point2D:
-        """
-
-        Args:
-            point2D (Point2D): [description]
-
-        Returns:
-            Point2D: [description]
+        """ Removes lens distortion to the given `Point2D`.
         """
         if np.any(self.kc):
             rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
@@ -154,7 +146,7 @@ class Calib():
             point2D = Point2D(self.K @ point2D.H) # to pixel coordinates
         return point2D
 
-    def crop(self, x_slice, y_slice):
+    def crop(self, x_slice, y_slice) -> 'Calib':
         x0 = x_slice.start
         y0 = y_slice.start
         width = x_slice.stop - x_slice.start
@@ -162,17 +154,17 @@ class Calib():
         T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
         return self.update(width=width, height=height, K=T@self.K)
 
-    def scale(self, output_width, output_height):
+    def scale(self, output_width, output_height) -> 'Calib':
         sx = output_width/self.width
         sy = output_height/self.height
         S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
         return self.update(width=output_width, height=output_height, K=S@self.K)
 
-    def flip(self):
+    def flip(self) -> 'Calib':
         F = np.array([[-1, 0, self.width-1], [0, 1, 0], [0, 0, 1]])
         return self.update(K=F@self.K)
 
-    def rotate(self, angle):
+    def rotate(self, angle) -> 'Calib':
         if angle == 0:
             return self
         A, new_width, new_height = compute_rotate(self.width, self.height, angle)
@@ -188,21 +180,15 @@ class Calib():
         length = np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=0)
         return length#float(length) if point3D.shape[1] == 1 else length
 
-    def projects_in(self, point3D: Point3D):
-        """ 
-
-        Args:
-            point3D (Point3D): 
-
-        Returns:
-            np.ndarray : `True` where point3D projects in the image, `False` otherwise.
-
+    def projects_in(self, point3D: Point3D) -> np.ndarray:
+        """ Check wether point3D projects into the `Calib` object.
+            Returns `True` where for points that projects in the image and `False` otherwise.
         """
         point2D = self.project_3D_to_2D(point3D)
         cond = np.stack((point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width, point2D.y <= self.height))
         return np.all(cond, axis=0)
 
-def find_intersection(C: Point3D, d, P: Point3D, n):
+def find_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
     """ Finds the intersection between a line and a plane.
         Arguments:
             C - a Point3D of a point on the line

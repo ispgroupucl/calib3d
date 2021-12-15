@@ -69,9 +69,6 @@
                                 <a class="function" href="#Calib.dump">dump</a>
                         </li>
                         <li>
-                                <a class="function" href="#Calib.project_3D_to_2D_cv2">project_3D_to_2D_cv2</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#Calib.project_3D_to_2D">project_3D_to_2D</a>
                         </li>
                         <li>
@@ -169,6 +166,8 @@
         
             <div class="docstring"><p>Represents a calibrated camera.</p>
 
+<p>$$rac{x}{y}$$</p>
+
 <h6 id="args">Args</h6>
 
 <ul>
@@ -177,7 +176,7 @@
 <li><strong>T (np.ndarray):</strong>  translation vector</li>
 <li><strong>R (np.ndarray):</strong>  rotation matrix</li>
 <li><strong>K (np.ndarray):</strong>  camera matrix holding intrinsic parameters</li>
-<li><strong>kc ([np.ndarray], optional):</strong>  lens distortion coefficients. Defaults to None.</li>
+<li><strong>kc (np.ndarray, optional):</strong>  lens distortion coefficients. Defaults to None.</li>
 </ul>
 </div>
 
@@ -188,7 +187,7 @@
 
         
             <span class="def">def</span>
-            <span class="name">update</span><span class="signature">(self, **kwargs)</span>:
+            <span class="name">update</span><span class="signature">(self, **kwargs) -&gt; <a href="#Calib">calib3d.calib.Calib</a></span>:
     </div>
 
         
@@ -215,7 +214,7 @@
                 <div class="decorator">@classmethod</div>
 
             <span class="def">def</span>
-            <span class="name">from_P</span><span class="signature">(cls, P, width, height)</span>:
+            <span class="name">from_P</span><span class="signature">(cls, P, width, height) -&gt; <a href="#Calib">calib3d.calib.Calib</a></span>:
     </div>
 
         
@@ -228,6 +227,12 @@
 <li><strong>width (int) :</strong>  image width</li>
 <li><strong>height (int) :</strong>  image height</li>
 </ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>A Calib object</p>
+</blockquote>
 </div>
 
 
@@ -238,7 +243,7 @@
                 <div class="decorator">@classmethod</div>
 
             <span class="def">def</span>
-            <span class="name">load</span><span class="signature">(cls, filename)</span>:
+            <span class="name">load</span><span class="signature">(cls, filename) -&gt; <a href="#Calib">calib3d.calib.Calib</a></span>:
     </div>
 
         
@@ -262,7 +267,7 @@
                             <div id="Calib.dict" class="classattr">
                                             <div class="attr variable"><a class="headerlink" href="#Calib.dict">#&nbsp;&nbsp</a>
 
-        <span class="name">dict</span>
+        <span class="name">dict</span><span class="annotation">: dict</span>
     </div>
 
             <div class="docstring"><p>Gets a dictionnary representing the calib object (allowing easier serialization)</p>
@@ -275,7 +280,7 @@
 
         
             <span class="def">def</span>
-            <span class="name">dump</span><span class="signature">(self, filename)</span>:
+            <span class="name">dump</span><span class="signature">(self, filename) -&gt; None</span>:
     </div>
 
         
@@ -290,24 +295,12 @@
 
 
                             </div>
-                            <div id="Calib.project_3D_to_2D_cv2" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#Calib.project_3D_to_2D_cv2">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">project_3D_to_2D_cv2</span><span class="signature">(self, point3D: <a href="points.html#Point3D">calib3d.points.Point3D</a>)</span>:
-    </div>
-
-        
-    
-
-                            </div>
                             <div id="Calib.project_3D_to_2D" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#Calib.project_3D_to_2D">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">project_3D_to_2D</span><span class="signature">(self, point3D: <a href="points.html#Point3D">calib3d.points.Point3D</a>)</span>:
+            <span class="name">project_3D_to_2D</span><span class="signature">(self, point3D: <a href="points.html#Point3D">calib3d.points.Point3D</a>) -&gt; <a href="points.html#Point2D">calib3d.points.Point2D</a></span>:
     </div>
 
         
@@ -333,7 +326,11 @@
 
         
             <span class="def">def</span>
-            <span class="name">project_2D_to_3D</span><span class="signature">(self, point2D: <a href="points.html#Point2D">calib3d.points.Point2D</a>, Z: float)</span>:
+            <span class="name">project_2D_to_3D</span><span class="signature">(
+    self,
+    point2D: <a href="points.html#Point2D">calib3d.points.Point2D</a>,
+    Z: float
+) -&gt; <a href="points.html#Point3D">calib3d.points.Point3D</a></span>:
     </div>
 
         
@@ -365,18 +362,6 @@
 
         
             <div class="docstring"><p>Applies lens distortions to the given <code>point2D</code>.</p>
-
-<h6 id="args">Args</h6>
-
-<ul>
-<li><strong>point2D (Point2D):</strong> </li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>Point2D: <code>Point2D</code> in the image space.</p>
-</blockquote>
 </div>
 
 
@@ -390,17 +375,7 @@
     </div>
 
         
-            <div class="docstring"><h6 id="args">Args</h6>
-
-<ul>
-<li><strong>point2D (Point2D):</strong>  [description]</li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>Point2D: [description]</p>
-</blockquote>
+            <div class="docstring"><p>Removes lens distortion to the given <code>Point2D</code>.</p>
 </div>
 
 
@@ -410,7 +385,7 @@
 
         
             <span class="def">def</span>
-            <span class="name">crop</span><span class="signature">(self, x_slice, y_slice)</span>:
+            <span class="name">crop</span><span class="signature">(self, x_slice, y_slice) -&gt; <a href="#Calib">calib3d.calib.Calib</a></span>:
     </div>
 
         
@@ -422,7 +397,7 @@
 
         
             <span class="def">def</span>
-            <span class="name">scale</span><span class="signature">(self, output_width, output_height)</span>:
+            <span class="name">scale</span><span class="signature">(self, output_width, output_height) -&gt; <a href="#Calib">calib3d.calib.Calib</a></span>:
     </div>
 
         
@@ -434,7 +409,7 @@
 
         
             <span class="def">def</span>
-            <span class="name">flip</span><span class="signature">(self)</span>:
+            <span class="name">flip</span><span class="signature">(self) -&gt; <a href="#Calib">calib3d.calib.Calib</a></span>:
     </div>
 
         
@@ -446,7 +421,7 @@
 
         
             <span class="def">def</span>
-            <span class="name">rotate</span><span class="signature">(self, angle)</span>:
+            <span class="name">rotate</span><span class="signature">(self, angle) -&gt; <a href="#Calib">calib3d.calib.Calib</a></span>:
     </div>
 
         
@@ -476,21 +451,12 @@
 
         
             <span class="def">def</span>
-            <span class="name">projects_in</span><span class="signature">(self, point3D: <a href="points.html#Point3D">calib3d.points.Point3D</a>)</span>:
+            <span class="name">projects_in</span><span class="signature">(self, point3D: <a href="points.html#Point3D">calib3d.points.Point3D</a>) -&gt; numpy.ndarray</span>:
     </div>
 
         
-            <div class="docstring"><h6 id="args">Args</h6>
-
-<ul>
-<li><strong>point3D (Point3D):</strong> </li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>np.ndarray : <code>True</code> where point3D projects in the image, <code>False</code> otherwise.</p>
-</blockquote>
+            <div class="docstring"><p>Check wether point3D projects into the <code><a href="#Calib">Calib</a></code> object.
+Returns <code>True</code> where for points that projects in the image and <code>False</code> otherwise.</p>
 </div>
 
 
@@ -501,7 +467,12 @@
 
         
             <span class="def">def</span>
-            <span class="name">find_intersection</span><span class="signature">(C: <a href="points.html#Point3D">calib3d.points.Point3D</a>, d, P: <a href="points.html#Point3D">calib3d.points.Point3D</a>, n)</span>:
+            <span class="name">find_intersection</span><span class="signature">(
+    C: <a href="points.html#Point3D">calib3d.points.Point3D</a>,
+    d,
+    P: <a href="points.html#Point3D">calib3d.points.Point3D</a>,
+    n
+) -&gt; <a href="points.html#Point3D">calib3d.points.Point3D</a></span>:
     </div>
 
         
