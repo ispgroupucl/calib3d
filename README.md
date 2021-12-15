@@ -1,5 +1,3 @@
-This file renders badly on dark mode. Please switch to bright mode.
-
 # Python camera calibration and projective geometry library
 
 This library offers several tools to ease manipulation of camera calibration, projective geometry and computations using homogenous coordinates.
@@ -7,27 +5,21 @@ This library offers several tools to ease manipulation of camera calibration, pr
 
 ## 2D and 3D points implementation
 
-The vector used to represent 2D and 3D points are _vertical_ vectors, which are stored as 2D matrices in `numpy`. Furthemore, in _homogenous_ coordinates: a 3D point ![`(x,y,z)`](https://render.githubusercontent.com/render/math?math=(x,y,z)) in the world is represented by a 4 element vector ![`(lambda*x,lambda*y,lambda*z,lambda)`](https://render.githubusercontent.com/render/math?math=\left[\lambda%20x,\lambda%20y,\lambda%20z,\lambda%20\right]^T) where ![`lambda in R_0`](https://render.githubusercontent.com/render/math?math=\lambda\in\mathbb{R}_0).
+The vector used to represent 2D and 3D points are _vertical_ vectors, which are stored as 2D matrices in `numpy`. Furthemore, in _homogenous_ coordinates: a 3D point _(x,y,z)_ in the world is represented by a 4 element vector _(𝜆x,𝜆y,𝜆z,𝜆)_ where _𝜆 ∈ ℝ₀_.
 
-To simplify access to ![`x`](https://render.githubusercontent.com/render/math?math=x) and ![`y`](https://render.githubusercontent.com/render/math?math=y) (and ![`z`](https://render.githubusercontent.com/render/math?math=z)) coordinates of those points as well as computations in homogenous coordinates, we defined the objects `Point2D` (and `Point3D`) extending `numpy.ndarray`. Therefore, access to ![`y`](https://render.githubusercontent.com/render/math?math=y) coordinate of `point` is `point.y` instead of `point[1][0]` (`point[1][:]` for an array of points), and access to homogenous coordinates is made easy with `point.H`, while it is still possible to use `point` with any `numpy` operators.
+To simplify access to _x_ and _y_ (and _z_) coordinates of those points as well as computations in homogenous coordinates, we defined the objects `Point2D` (and `Point3D`) extending `numpy.ndarray`. Therefore, access to y coordinate of `point` is `point.y` instead of `point[1][0]` (`point[1][:]` for an array of points), and access to homogenous coordinates is made easy with `point.H`, while it is still possible to use `point` with any `numpy` operators.
 
 ### Construction
 
-The construction of such point is made convenient with multiple ways of building them. Given ![`x`](https://render.githubusercontent.com/render/math?math=x)=`x`, ![`y`](https://render.githubusercontent.com/render/math?math=y)=`y` and ![`lambda`](https://render.githubusercontent.com/render/math?math=\lambda)=`l`, a 2D point can be created the following ways:
+The construction of such point is made convenient with multiple ways of building them. With 𝜆 represented as `l` a 2D point can be created provided `x` and `y` as scalar for single points, or as `numpy.ndarray`, `list` or `tuple` for array of points.
  - `Point2D(x, y)`
  - `Point2D(l*x, l*y, l)`
 
-This also handles arrays of points where the components are `numpy.ndarray`, `list` or `tuple`.
-
-The construction can also be made from `numpy` arrays of dimensions ![`(D,N)`](https://render.githubusercontent.com/render/math?math=(D,N)) or ![`(D+1,N)`](https://render.githubusercontent.com/render/math?math=(D%2B1,N)) in homogenous coordinates where ![`D in {2,3}`](https://render.githubusercontent.com/render/math?math=D\in\\\{2,3\\\}) is the space dimension and ![`N in N`](https://render.githubusercontent.com/render/math?math=N\in\mathbb{N}) is the number of points (which can be 0 for an empty set of points). Example:
+The construction can also be made from `numpy` arrays of dimensions _(D,N)_ or _(D+1,N)_ in homogenous coordinates where _D ∈ {2,3}_ is the space dimension and N is the number of points (which can be 0 for an empty set of points). Example:
 ```
 >>> array = np.array([[0, 0, 0, 0, 0],  # x coordinates
                       [1, 2, 3, 4, 5]]) # y coordinates
 >>> points = Point2D(array)
->>> points
-Point2D([[0., 0., 0., 0., 0.],
-         [1., 2., 3., 4., 5.]])
-
 >>> points.x
 array([0., 0., 0., 0., 0.])
 
@@ -56,10 +48,17 @@ Point2D([[6.],
 
 ## Camera calibration
 
-This section is a work in progress
 
-This library implements a `Calib` object that, given the intrinsic and extrinsic parameters of a camera
+This library implements a `Calib` object that represent a calibrated camera given its intrinsic and extrinsic parameters.
+The object has a serie of methods to handle 3D to 2D projections, 2D to 3D liftings, image transformations and more.
 
+### Construction
+
+The `Calib` object requires the camera matirx `K`, the rotation matrix `R`, the translation vector `T`, the image `width` and `height` and optionally the lens distortion coefficients `kc`.
+
+`R` is expressed using Euler angles and represents the rotation applied to the world coordinates system to obtain the camera coordinates system orientation.
+
+`T` is the position of the origin of the world coordinates system expressed in the camera coordinates system
 The _camera_ coordinates system is therefore a transformation of the _world_ coordinates systems with:
 - A **rotation** defined by a rotation matrix $R$ using euler angles in a right-hand orthogonal system. The rotation is applied to the world coordinates system to obtain the camera orientation.
 - A **translation** defined by a translation vector $T$ representing the position of the center of the world in the camera coordinates system !
