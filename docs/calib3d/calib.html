@@ -167,14 +167,18 @@
     </div>
 
         
-            <div class="docstring"><h2 id="parameters">Parameters</h2>
+            <div class="docstring"><p>Represents a calibrated camera.</p>
 
-<p>width: int
-    Camera width
-height: int
-    Camera height
-T: np.ndarray
-    Translation vector</p>
+<h6 id="args">Args</h6>
+
+<ul>
+<li><strong>width (int):</strong>  image width</li>
+<li><strong>height (int):</strong>  image height</li>
+<li><strong>T (np.ndarray):</strong>  translation vector</li>
+<li><strong>R (np.ndarray):</strong>  rotation matrix</li>
+<li><strong>K (np.ndarray):</strong>  camera matrix holding intrinsic parameters</li>
+<li><strong>kc ([np.ndarray], optional):</strong>  lens distortion coefficients. Defaults to None.</li>
+</ul>
 </div>
 
 
@@ -193,7 +197,7 @@ T: np.ndarray
 <h6 id="args">Args</h6>
 
 <ul>
-<li>Any of the arguments of <code><a href="#Calib">Calib</a></code></li>
+<li><strong>**kwargs :</strong>  Any of the arguments of <code><a href="#Calib">Calib</a></code>. Other arguments remain unchanged.</li>
 </ul>
 
 <h6 id="returns">Returns</h6>
@@ -356,11 +360,25 @@ T: np.ndarray
 
         
             <span class="def">def</span>
-            <span class="name">distort</span><span class="signature">(self, point2D: <a href="points.html#Point2D">calib3d.points.Point2D</a>)</span>:
+            <span class="name">distort</span><span class="signature">(self, point2D: <a href="points.html#Point2D">calib3d.points.Point2D</a>) -&gt; <a href="points.html#Point2D">calib3d.points.Point2D</a></span>:
     </div>
 
         
-    
+            <div class="docstring"><p>Applies lens distortions to the given <code>point2D</code>.</p>
+
+<h6 id="args">Args</h6>
+
+<ul>
+<li><strong>point2D (Point2D):</strong> </li>
+</ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>Point2D: <code>Point2D</code> in the image space.</p>
+</blockquote>
+</div>
+
 
                             </div>
                             <div id="Calib.rectify" class="classattr">
@@ -368,11 +386,23 @@ T: np.ndarray
 
         
             <span class="def">def</span>
-            <span class="name">rectify</span><span class="signature">(self, point2D: <a href="points.html#Point2D">calib3d.points.Point2D</a>)</span>:
+            <span class="name">rectify</span><span class="signature">(self, point2D: <a href="points.html#Point2D">calib3d.points.Point2D</a>) -&gt; <a href="points.html#Point2D">calib3d.points.Point2D</a></span>:
     </div>
 
         
-    
+            <div class="docstring"><h6 id="args">Args</h6>
+
+<ul>
+<li><strong>point2D (Point2D):</strong>  [description]</li>
+</ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>Point2D: [description]</p>
+</blockquote>
+</div>
+
 
                             </div>
                             <div id="Calib.crop" class="classattr">
@@ -428,7 +458,11 @@ T: np.ndarray
 
         
             <span class="def">def</span>
-            <span class="name">compute_length2D</span><span class="signature">(self, length3D: float, point3D: <a href="points.html#Point3D">calib3d.points.Point3D</a>)</span>:
+            <span class="name">compute_length2D</span><span class="signature">(
+    self,
+    length3D: float,
+    point3D: <a href="points.html#Point3D">calib3d.points.Point3D</a>
+) -&gt; numpy.ndarray</span>:
     </div>
 
         
@@ -442,11 +476,23 @@ T: np.ndarray
 
         
             <span class="def">def</span>
-            <span class="name">projects_in</span><span class="signature">(self, point3D)</span>:
+            <span class="name">projects_in</span><span class="signature">(self, point3D: <a href="points.html#Point3D">calib3d.points.Point3D</a>)</span>:
     </div>
 
         
-    
+            <div class="docstring"><h6 id="args">Args</h6>
+
+<ul>
+<li><strong>point3D (Point3D):</strong> </li>
+</ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>np.ndarray : <code>True</code> where point3D projects in the image, <code>False</code> otherwise.</p>
+</blockquote>
+</div>
+
 
                             </div>
                 </section>
