@@ -51,6 +51,15 @@
                     <a class="class" href="#HomogeneousCoordinatesPoint">HomogeneousCoordinatesPoint</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#HomogeneousCoordinatesPoint.x">x</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#HomogeneousCoordinatesPoint.y">y</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#HomogeneousCoordinatesPoint.z">z</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#HomogeneousCoordinatesPoint.H">H</a>
                         </li>
                         <li>
@@ -67,15 +76,6 @@
                         </li>
                         <li>
                                 <a class="function" href="#HomogeneousCoordinatesPoint.close">close</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#HomogeneousCoordinatesPoint.x">x</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#HomogeneousCoordinatesPoint.y">y</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#HomogeneousCoordinatesPoint.z">z</a>
                         </li>
                 </ul>
 
@@ -133,18 +133,56 @@
     </div>
 
         
-            <div class="docstring"><p>Generic homogenous coordinates points implementation for <code><a href="#Point2D">Point2D</a></code> and <code><a href="#Point3D">Point3D</a></code> objects.</p>
+            <div class="docstring"><p>Extension of Numpy <code>np.ndarray</code> that implements generic homogenous coordinates points
+for <code><a href="#Point2D">Point2D</a></code> and <code><a href="#Point3D">Point3D</a></code> objects. The constructor supports multiple formats for creation
+of a single point or array of multiple points.</p>
 
-<h6 id="attributes">Attributes</h6>
+<p>Example with creation of <code><a href="#Point2D">Point2D</a></code> objects, all formulations are equivalent:</p>
 
-<ul>
-<li><strong>D (int) :</strong>  spatial dimention (2 for <code><a href="#Point2D">Point2D</a></code> and 3 for <code><a href="#Point3D">Point3D</a></code>)</li>
-</ul>
-
-<p>Methods:</p>
+<pre><code>&gt;&gt;&gt; x, y = 1, 2
+&gt;&gt;&gt; Point2D(x, y)
+&gt;&gt;&gt; Point2D(4*x, 4*y, 4)
+&gt;&gt;&gt; Point2D(np.array([[x], [y]]))
+&gt;&gt;&gt; Point2D(4*np.array([[x], [y], [1]]))
+Point2D([[1.],
+         [2.]])
+</code></pre>
 </div>
 
 
+                            <div id="HomogeneousCoordinatesPoint.x" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#HomogeneousCoordinatesPoint.x">#&nbsp;&nbsp</a>
+
+        <span class="name">x</span>
+    </div>
+
+            <div class="docstring"><p>Point's x component</p>
+</div>
+
+
+                            </div>
+                            <div id="HomogeneousCoordinatesPoint.y" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#HomogeneousCoordinatesPoint.y">#&nbsp;&nbsp</a>
+
+        <span class="name">y</span>
+    </div>
+
+            <div class="docstring"><p>Point's y component</p>
+</div>
+
+
+                            </div>
+                            <div id="HomogeneousCoordinatesPoint.z" class="classattr">
+                                            <div class="attr variable"><a class="headerlink" href="#HomogeneousCoordinatesPoint.z">#&nbsp;&nbsp</a>
+
+        <span class="name">z</span>
+    </div>
+
+            <div class="docstring"><p>Point's z component (only valid for <code><a href="#Point3D">Point3D</a></code> objects)</p>
+</div>
+
+
+                            </div>
                             <div id="HomogeneousCoordinatesPoint.H" class="classattr">
                                             <div class="attr variable"><a class="headerlink" href="#HomogeneousCoordinatesPoint.H">#&nbsp;&nbsp</a>
 
@@ -175,7 +213,7 @@ array([[1.],
     </div>
 
         
-            <div class="docstring"><p>Transform a single point to a python list.</p>
+            <div class="docstring"><p>Transforms a single point to a python list.</p>
 
 <h6 id="raises">Raises</h6>
 
@@ -250,39 +288,6 @@ array([[1.],
 hence "closing" the polygon defined by the initial points.</p>
 
 <p>TODO: add Points2D and Points3D classes</p>
-</div>
-
-
-                            </div>
-                            <div id="HomogeneousCoordinatesPoint.x" class="classattr">
-                                            <div class="attr variable"><a class="headerlink" href="#HomogeneousCoordinatesPoint.x">#&nbsp;&nbsp</a>
-
-        <span class="name">x</span>
-    </div>
-
-            <div class="docstring"><p>Point's x component</p>
-</div>
-
-
-                            </div>
-                            <div id="HomogeneousCoordinatesPoint.y" class="classattr">
-                                            <div class="attr variable"><a class="headerlink" href="#HomogeneousCoordinatesPoint.y">#&nbsp;&nbsp</a>
-
-        <span class="name">y</span>
-    </div>
-
-            <div class="docstring"><p>Point's y component</p>
-</div>
-
-
-                            </div>
-                            <div id="HomogeneousCoordinatesPoint.z" class="classattr">
-                                            <div class="attr variable"><a class="headerlink" href="#HomogeneousCoordinatesPoint.z">#&nbsp;&nbsp</a>
-
-        <span class="name">z</span>
-    </div>
-
-            <div class="docstring"><p>Point's z component (only valid for <code><a href="#Point3D">Point3D</a></code> objects)</p>
 </div>
 
 
@@ -404,15 +409,15 @@ hence "closing" the polygon defined by the initial points.</p>
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="#HomogeneousCoordinatesPoint">HomogeneousCoordinatesPoint</a></dt>
-                                <dd id="Point3D.H" class="variable"><a href="#HomogeneousCoordinatesPoint.H">H</a></dd>
+                                <dd id="Point3D.x" class="variable"><a href="#HomogeneousCoordinatesPoint.x">x</a></dd>
+                <dd id="Point3D.y" class="variable"><a href="#HomogeneousCoordinatesPoint.y">y</a></dd>
+                <dd id="Point3D.z" class="variable"><a href="#HomogeneousCoordinatesPoint.z">z</a></dd>
+                <dd id="Point3D.H" class="variable"><a href="#HomogeneousCoordinatesPoint.H">H</a></dd>
                 <dd id="Point3D.to_list" class="function"><a href="#HomogeneousCoordinatesPoint.to_list">to_list</a></dd>
                 <dd id="Point3D.flatten" class="function"><a href="#HomogeneousCoordinatesPoint.flatten">flatten</a></dd>
                 <dd id="Point3D.to_int_tuple" class="function"><a href="#HomogeneousCoordinatesPoint.to_int_tuple">to_int_tuple</a></dd>
                 <dd id="Point3D.linspace" class="function"><a href="#HomogeneousCoordinatesPoint.linspace">linspace</a></dd>
                 <dd id="Point3D.close" class="function"><a href="#HomogeneousCoordinatesPoint.close">close</a></dd>
-                <dd id="Point3D.x" class="variable"><a href="#HomogeneousCoordinatesPoint.x">x</a></dd>
-                <dd id="Point3D.y" class="variable"><a href="#HomogeneousCoordinatesPoint.y">y</a></dd>
-                <dd id="Point3D.z" class="variable"><a href="#HomogeneousCoordinatesPoint.z">z</a></dd>
 
             </div>
             <div><dt>numpy.ndarray</dt>
@@ -529,15 +534,15 @@ hence "closing" the polygon defined by the initial points.</p>
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="#HomogeneousCoordinatesPoint">HomogeneousCoordinatesPoint</a></dt>
-                                <dd id="Point2D.H" class="variable"><a href="#HomogeneousCoordinatesPoint.H">H</a></dd>
+                                <dd id="Point2D.x" class="variable"><a href="#HomogeneousCoordinatesPoint.x">x</a></dd>
+                <dd id="Point2D.y" class="variable"><a href="#HomogeneousCoordinatesPoint.y">y</a></dd>
+                <dd id="Point2D.z" class="variable"><a href="#HomogeneousCoordinatesPoint.z">z</a></dd>
+                <dd id="Point2D.H" class="variable"><a href="#HomogeneousCoordinatesPoint.H">H</a></dd>
                 <dd id="Point2D.to_list" class="function"><a href="#HomogeneousCoordinatesPoint.to_list">to_list</a></dd>
                 <dd id="Point2D.flatten" class="function"><a href="#HomogeneousCoordinatesPoint.flatten">flatten</a></dd>
                 <dd id="Point2D.to_int_tuple" class="function"><a href="#HomogeneousCoordinatesPoint.to_int_tuple">to_int_tuple</a></dd>
                 <dd id="Point2D.linspace" class="function"><a href="#HomogeneousCoordinatesPoint.linspace">linspace</a></dd>
                 <dd id="Point2D.close" class="function"><a href="#HomogeneousCoordinatesPoint.close">close</a></dd>
-                <dd id="Point2D.x" class="variable"><a href="#HomogeneousCoordinatesPoint.x">x</a></dd>
-                <dd id="Point2D.y" class="variable"><a href="#HomogeneousCoordinatesPoint.y">y</a></dd>
-                <dd id="Point2D.z" class="variable"><a href="#HomogeneousCoordinatesPoint.z">z</a></dd>
 
             </div>
             <div><dt>numpy.ndarray</dt>
