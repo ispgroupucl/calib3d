@@ -161,11 +161,7 @@
     T: numpy.ndarray,
     R: numpy.ndarray,
     K: numpy.ndarray,
-    kc=array([[0.],
-       [0.],
-       [0.],
-       [0.],
-       [0.]]),
+    kc=None,
     **_
 )</span>
     </div>
@@ -194,11 +190,11 @@ T: np.ndarray
         
             <div class="docstring"><p>Creates another Calib object with the given keyword arguments updated</p>
 
-<h6 id="arguments">Arguments</h6>
+<h6 id="args">Args</h6>
 
-<blockquote>
-  <p>Any of the arguments of __init__</p>
-</blockquote>
+<ul>
+<li>Any of the arguments of <code><a href="#Calib">Calib</a></code></li>
+</ul>
 
 <h6 id="returns">Returns</h6>
 
@@ -219,7 +215,17 @@ T: np.ndarray
     </div>
 
         
-    
+            <div class="docstring"><p>Create a <code><a href="#Calib">Calib</a></code> object from a given projection matrix <code>P</code> and image dimensions <code>width</code> and <code>height</code>.</p>
+
+<h6 id="args">Args</h6>
+
+<ul>
+<li><strong>P (np.ndarray) :</strong>  a 3x4 projection matrix</li>
+<li><strong>width (int) :</strong>  image width</li>
+<li><strong>height (int) :</strong>  image height</li>
+</ul>
+</div>
+
 
                             </div>
                             <div id="Calib.load" class="classattr">
@@ -234,16 +240,16 @@ T: np.ndarray
         
             <div class="docstring"><p>Loads a Calib object from a file (using the pickle library)</p>
 
-<h6 id="argument">Argument</h6>
+<h6 id="args">Args</h6>
 
-<blockquote>
-  <p>filename   - the file that stores the Calib object</p>
-</blockquote>
+<ul>
+<li><strong>filename (str) :</strong>  the file that stores the Calib object</li>
+</ul>
 
 <h6 id="returns">Returns</h6>
 
 <blockquote>
-  <p>The Calib object</p>
+  <p>The <code><a href="#Calib">Calib</a></code> object previously saved in <code>filename</code>.</p>
 </blockquote>
 </div>
 
@@ -271,11 +277,11 @@ T: np.ndarray
         
             <div class="docstring"><p>Saves the current calib object to a file (using the pickle library)</p>
 
-<h6 id="argument">Argument</h6>
+<h6 id="args">Args</h6>
 
-<blockquote>
-  <p>filename    - the file that will store the calib object</p>
-</blockquote>
+<ul>
+<li><strong>filename (str) :</strong>  the file that will store the calib object</li>
+</ul>
 </div>
 
 
@@ -303,11 +309,11 @@ T: np.ndarray
         
             <div class="docstring"><p>Using the calib object, project a 3D point in the 2D image space.</p>
 
-<h6 id="arguments">Arguments</h6>
+<h6 id="args">Args</h6>
 
-<blockquote>
-  <p>point3D (Point3D) : the 3D point to be projected</p>
-</blockquote>
+<ul>
+<li><strong>point3D (Point3D) :</strong>  the 3D point to be projected</li>
+</ul>
 
 <h6 id="returns">Returns</h6>
 
@@ -329,17 +335,17 @@ T: np.ndarray
         
             <div class="docstring"><p>Using the calib object, project a 2D point in the 3D image space.</p>
 
-<h6 id="arguments">Arguments</h6>
+<h6 id="args">Args</h6>
 
-<blockquote>
-  <p>point2D    - the 2D point to be projected
-  Z          - the Z coordinate of the 3D point</p>
-</blockquote>
+<ul>
+<li><strong>point2D (Point2D) :</strong>  the 2D point to be projected</li>
+<li><strong>Z (float) :</strong>  the Z coordinate of the 3D point</li>
+</ul>
 
 <h6 id="returns">Returns</h6>
 
 <blockquote>
-  <p>The point in the 3D world for which the z=Z and that projects on point2D</p>
+  <p>The point in the 3D world for which the z=<code>Z</code> and that projects on <code>point2D</code>.</p>
 </blockquote>
 </div>
 

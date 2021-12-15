@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# build documentation
+pdoc calib3d -d google --math --no-show-source -o docs/
+
 # Extract version number from setup.py
 RELEASE_NUM=`grep version setup.py | cut -d\" -f2 | cut -d\' -f2`
 echo "RELEASE_NUM=$RELEASE_NUM"

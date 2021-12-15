@@ -4,32 +4,31 @@ import cv2
 from .points import Point2D, Point3D
 
 class Calib():
-    def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, kc=np.zeros((5,1)), **_) -> None:
-        """
-        Parameters
-        ----------
-        width: int
-            Camera width
-        height: int
-            Camera height
-        T: np.ndarray
-            Translation vector
+    def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, kc=None, **_) -> None:
+        """ Represents a calibrated camera.
+
+        Args:
+            width (int): image width
+            height (int): image height
+            T (np.ndarray): translation vector
+            R (np.ndarray): rotation matrix
+            K (np.ndarray): camera matrix holding intrinsic parameters
+            kc ([np.ndarray], optional): lens distortion coefficients. Defaults to None.
         """
         self.width = int(width)
         self.height = int(height)
         self.T = T
         self.K = K
-        self.kc = np.array(kc, dtype=np.float64)
+        self.kc = np.array(kc or [0,0,0,0,0], dtype=np.float64)
         self.R = R
         self.C = Point3D(-R.T@T)
         self.P = self.K @ np.hstack((self.R, self.T))
         self.Pinv = np.linalg.pinv(self.P)
         self.Kinv = np.linalg.pinv(self.K)
-
     def update(self, **kwargs):
         """ Creates another Calib object with the given keyword arguments updated
-            Arguments:
-                Any of the arguments of __init__
+            Args:
+                **kwargs : Any of the arguments of `Calib`. Other arguments remain unchanged.
             Returns:
                 A new Calib object
         """
@@ -37,16 +36,22 @@ class Calib():
 
     @classmethod
     def from_P(cls, P, width, height):
+        """ Create a `Calib` object from a given projection matrix `P` and image dimensions `width` and `height`.
+            Args:
+                P (np.ndarray) : a 3x4 projection matrix
+                width (int) : image width
+                height (int) : image height
+        """
         K, R, T, Rx, Ry, Rz, angles = cv2.decomposeProjectionMatrix(P) # pylint: disable=unused-variable
         return cls(K=K, R=R, T=Point3D(-R@Point3D(T)), width=width, height=height)
 
     @classmethod
     def load(cls, filename):
         """ Loads a Calib object from a file (using the pickle library)
-            Argument:
-                filename   - the file that stores the Calib object
+            Args:
+                filename (str) : the file that stores the Calib object
             Returns:
-                The Calib object
+                The `Calib` object previously saved in `filename`.
         """
         with open(filename, "rb") as f:
             return cls(**pickle.load(f))
@@ -59,8 +64,8 @@ class Calib():
 
     def dump(self, filename):
         """ Saves the current calib object to a file (using the pickle library)
-            Argument:
-                filename    - the file that will store the calib object
+            Args:
+                filename (str) : the file that will store the calib object
         """
         with open(filename, "wb") as f:
             pickle.dump(self.dict, f)
@@ -71,7 +76,7 @@ class Calib():
 
     def project_3D_to_2D(self, point3D: Point3D):
         """ Using the calib object, project a 3D point in the 2D image space.
-            Arguments:
+            Args:
                 point3D (Point3D) : the 3D point to be projected
             Returns:
                 The point in the 2D image space on which point3D is projected by calib
@@ -87,11 +92,11 @@ class Calib():
 
     def project_2D_to_3D(self, point2D: Point2D, Z: float):
         """ Using the calib object, project a 2D point in the 3D image space.
-            Arguments:
-                point2D    - the 2D point to be projected
-                Z          - the Z coordinate of the 3D point
+            Args:
+                point2D (Point2D) : the 2D point to be projected
+                Z (float) : the Z coordinate of the 3D point
             Returns:
-                The point in the 3D world for which the z=Z and that projects on point2D
+                The point in the 3D world for which the z=`Z` and that projects on `point2D`.
         """
         assert isinstance(point2D, Point2D), "Wrong argument type '{}'. Expected {}".format(type(point2D), Point2D)
         point2D = self.rectify(point2D)
@@ -99,7 +104,15 @@ class Calib():
         d = (X - self.C)
         return find_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)
 
-    def distort(self, point2D: Point2D):
+    def distort(self, point2D: Point2D) -> Point2D:
+        """ Applies lens distortions to the given `point2D`.
+
+        Args:
+            point2D (Point2D): 
+
+        Returns:
+            Point2D: `Point2D` in the image space.
+        """
         if np.any(self.kc):
             rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
             # Convert image coordinates to camera coordinates (with z=1 which is the projection plane)
@@ -117,7 +130,15 @@ class Calib():
             point2D = Point2D(self.K @ point2D.H)
         return point2D
 
-    def rectify(self, point2D: Point2D):
+    def rectify(self, point2D: Point2D) -> Point2D:
+        """
+
+        Args:
+            point2D (Point2D): [description]
+
+        Returns:
+            Point2D: [description]
+        """
         if np.any(self.kc):
             rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
             point2D = Point2D(self.Kinv @ point2D.H) # to camera coordinates
@@ -157,7 +178,7 @@ class Calib():
         A, new_width, new_height = compute_rotate(self.width, self.height, angle)
         return self.update(K=A@self.K, width=new_width, height=new_height)
 
-    def compute_length2D(self, length3D: float, point3D: Point3D):
+    def compute_length2D(self, length3D: float, point3D: Point3D) -> np.ndarray:
         """ Returns the length in pixel of a 3D length at point3D
         """
         assert np.isscalar(length3D), f"This function expects a scalar `length3D` argument. Received {length3D}"
@@ -167,7 +188,16 @@ class Calib():
         length = np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=0)
         return length#float(length) if point3D.shape[1] == 1 else length
 
-    def projects_in(self, point3D):
+    def projects_in(self, point3D: Point3D):
+        """ 
+
+        Args:
+            point3D (Point3D): 
+
+        Returns:
+            np.ndarray : `True` where point3D projects in the image, `False` otherwise.
+
+        """
         point2D = self.project_3D_to_2D(point3D)
         cond = np.stack((point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width, point2D.y <= self.height))
         return np.all(cond, axis=0)
