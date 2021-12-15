@@ -2,7 +2,7 @@
 
 This library offers several tools to ease manipulation of camera calibration, projective geometry and computations using homogenous coordinates.
 
-Full API documentation is available in docs/calib3d/index.html
+Full API documentation is available in [here](https://ispgroupucl.github.io/calib3d).
 
 
 ## 2D and 3D points implementation
