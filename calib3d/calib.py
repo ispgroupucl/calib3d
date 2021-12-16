@@ -76,10 +76,11 @@ The 2D vector in homogenous coordinates is not affected by the value of \(\lambd
 ## Projection model
 
 Therefore, by combining
+
 - the transformation from the world coordinates system to the camera coordinates system (defined by \(R\) and \(T\))
 - with the projection from the camera coordinates system to the image pixels (defined by \(K\)),
 
-We have a projection model allowing to compute the coordinates of a 2D point in the image \(\left(i,j\right)\) from a 3D point in the real world $\left(x,y,z\right)$ described by the matrix \(P\):
+We have a projection model allowing to compute the coordinates of a 2D point in the image \(\left(i,j\right)\) from a 3D point in the real world \(\left(x,y,z\right)\) described by the matrix \(P\):
 $$P := \left[\begin{matrix}K_{3\times 3}&{\bf 0}_{3\times 1}\end{matrix}\right] \left[\begin{matrix}R_{3\times 3}&T_{3\times 1}\\{\bf 0}_{1\times 3}&1\end{matrix}\right]=K_{3\times 3}\left[\begin{matrix}R_{3\times 3}&T_{3\times 1}\end{matrix}\right]$$
 
 The opposite operation requires to invert \(P\) and is done by pseudo-inverse inversion because \(P\) is rectangular.
@@ -132,10 +133,11 @@ class Calib():
     @classmethod
     def from_P(cls, P, width, height) -> 'Calib':
         """ Create a `Calib` object from a given projection matrix `P` and image dimensions `width` and `height`.
+
             Args:
-                P (np.ndarray) : a 3x4 projection matrix
-                width (int) : image width
-                height (int) : image height
+                P (np.ndarray): a 3x4 projection matrix
+                width (int): image width
+                height (int): image height
             Returns:
                 A Calib object
         """
@@ -146,7 +148,7 @@ class Calib():
     def load(cls, filename) -> 'Calib':
         """ Loads a Calib object from a file (using the pickle library)
             Args:
-                filename (str) : the file that stores the Calib object
+                filename (str): the file that stores the Calib object
             Returns:
                 The `Calib` object previously saved in `filename`.
         """
@@ -162,7 +164,7 @@ class Calib():
     def dump(self, filename) -> None:
         """ Saves the current calib object to a file (using the pickle library)
             Args:
-                filename (str) : the file that will store the calib object
+                filename (str): the file that will store the calib object
         """
         with open(filename, "wb") as f:
             pickle.dump(self.dict, f)
@@ -174,7 +176,7 @@ class Calib():
     def project_3D_to_2D(self, point3D: Point3D) -> Point2D:
         """ Using the calib object, project a 3D point in the 2D image space.
             Args:
-                point3D (Point3D) : the 3D point to be projected
+                point3D (Point3D): the 3D point to be projected
             Returns:
                 The point in the 2D image space on which point3D is projected by calib
         """
@@ -190,8 +192,8 @@ class Calib():
     def project_2D_to_3D(self, point2D: Point2D, Z: float) -> Point3D:
         """ Using the calib object, project a 2D point in the 3D image space.
             Args:
-                point2D (Point2D) : the 2D point to be projected
-                Z (float) : the Z coordinate of the 3D point
+                point2D (Point2D): the 2D point to be projected
+                Z (float): the Z coordinate of the 3D point
             Returns:
                 The point in the 3D world for which the z=`Z` and that projects on `point2D`.
         """
@@ -283,11 +285,11 @@ class Calib():
 
 def find_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
     """ Finds the intersection between a line and a plane.
-        Arguments:
-            C - a Point3D of a point on the line
-            d - the direction-vector of the line
-            P - a Point3D on the plane
-            n - the normal vector of the plane
+        Args:
+            C (Point3D): a point on the line
+            d (np.ndarray): the direction-vector of the line
+            P (Point3D): a Point3D on the plane
+            n (np.ndarray): the normal vector of the plane
         Returns the Point3D at the intersection between the line and the plane.
     """
     d = d/np.linalg.norm(d, axis=0)
