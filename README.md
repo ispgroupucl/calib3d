@@ -13,6 +13,7 @@ The vector used to represent 2D and 3D points are _vertical_ vectors, which are 
 
 To simplify access to _x_ and _y_ (and _z_) coordinates of those points as well as computations in homogenous coordinates, we defined the objects `Point2D` (and `Point3D`) extending `numpy.ndarray`. Therefore, access to y coordinate of `point` is `point.y` instead of `point[1][0]` (`point[1][:]` for an array of points), and access to homogenous coordinates is made easy with `point.H`, while it is still possible to use `point` with any `numpy` operators.
 
+
 ### Construction
 
 The construction of such point is made convenient with multiple ways of building them. With 𝜆 represented as `l` a 2D point can be created provided `x` and `y` as scalar for single points, or as `numpy.ndarray`, `list` or `tuple` for array of points.
