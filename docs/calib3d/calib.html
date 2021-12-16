@@ -1,0 +1,1285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>calib3d.calib API documentation</title>
+<meta name="description" content="Calibrated camera …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>calib3d.calib</code></h1>
+</header>
+<section id="section-intro">
+<h1 id="calibrated-camera">Calibrated camera</h1>
+<p>Camera calibration is based on the pinhole camera model that approximate how lights travels between the scene and the camera sensor. There are two sets of parameters:</p>
+<ul>
+<li>The <strong>extrinsic parameters</strong> define the position of the camera and it's heading relative to the world coordinates system.</li>
+<li>The <strong>Intrinsic parameters</strong> define the camera sensor and lens parameters.</li>
+</ul>
+<p>They are 3 different coordinates systems:</p>
+<ul>
+<li>The world 3D coordinates system</li>
+<li>The camera 3D coordinates system</li>
+<li>The 2D pixel positions where 3D positions are being projected.</li>
+</ul>
+<h2 id="extrinsic-parameters">Extrinsic parameters</h2>
+<p>The extrinsic parameters defines the transformations from the world 3D coordinates <span><span class="MathJax_Preview">\left[x_O,y_O,z_O\right]^T</span><script type="math/tex">\left[x_O,y_O,z_O\right]^T</script></span> to the camera 3D coordinates <span><span class="MathJax_Preview">\left[x_C,y_C,z_C\right]^T</span><script type="math/tex">\left[x_C,y_C,z_C\right]^T</script></span>. The camera 3D coordinates system has the following <strong>conventions</strong>:</p>
+<ul>
+<li>The point <span><span class="MathJax_Preview">(0,0,0)</span><script type="math/tex">(0,0,0)</script></span> is the center of projection of the camera and is called the <em>principal point</em>.</li>
+<li>The <span><span class="MathJax_Preview">z</span><script type="math/tex">z</script></span> axis of the camera points <em>towards the scene</em>, the <span><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span> axis is along the sensor width pointing towards the right, and the <span><span class="MathJax_Preview">y</span><script type="math/tex">y</script></span> axis is along the sensor height pointing towards the bottom.</li>
+</ul>
+<p>The camera coordinates system is therefore a <em>transformation</em> of the world coordinates systems with:</p>
+<ul>
+<li>A <strong>rotation</strong> defined by a rotation matrix <span><span class="MathJax_Preview">R</span><script type="math/tex">R</script></span> using euler angles in a right-hand orthogonal system. The rotation is applied to the world coordinates system to obtain the camera orientation.</li>
+<li>A <strong>translation</strong> defined by a translation vector <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span> representing the position of the center of the world in the camera coordinates system !</li>
+</ul>
+<p>Hence,</p>
+<p><span><span class="MathJax_Preview">\lambda\left[\begin{matrix}x_C\\ y_C\\ z_C\\ 1\end{matrix}\right] = \left[\begin{matrix}
+R_{3\times 3} &amp; T_{3\times 1}\\{\bf 0}_{1\times 3}&amp;1
+\end{matrix}\right] \left[\begin{matrix}x_O\\y_O\\z_O\\1\end{matrix}\right]</span><script type="math/tex; mode=display">\lambda\left[\begin{matrix}x_C\\ y_C\\ z_C\\ 1\end{matrix}\right] = \left[\begin{matrix}
+R_{3\times 3} & T_{3\times 1}\\{\bf 0}_{1\times 3}&1
+\end{matrix}\right] \left[\begin{matrix}x_O\\y_O\\z_O\\1\end{matrix}\right]</script></span></p>
+<p><strong>Important notes:</strong></p>
+<ul>
+<li>The rotation matrix represents a passive (or alias) transformation because it's the coordinates system that rotates and not the objects.</li>
+<li>Euler angles define a 3D rotation starting with a rotation around <span><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span> followed by a rotation around <span><span class="MathJax_Preview">y</span><script type="math/tex">y</script></span> followed by a rotation around <span><span class="MathJax_Preview">z</span><script type="math/tex">z</script></span> (the order matters).</li>
+<li>If <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span> is expressed in the camera coordinate system, the position of the camera expressed in world coordinates system is <span><span class="MathJax_Preview">C:=-R^{-1}T = -R^{T}T</span><script type="math/tex">C:=-R^{-1}T = -R^{T}T</script></span> (since <span><span class="MathJax_Preview">R</span><script type="math/tex">R</script></span> is a rotation matrix).</li>
+</ul>
+<h2 id="intrinsic-parameters">Intrinsic parameters</h2>
+<p>The intrinsic parameters defines the transformation between the 3D coordinates relative to the camera center <span><span class="MathJax_Preview">\left[x_C,y_C,z_C\right]^T</span><script type="math/tex">\left[x_C,y_C,z_C\right]^T</script></span> and the 2D coordinates in the camera sensor <span><span class="MathJax_Preview">\left[i,j\right]^T</span><script type="math/tex">\left[i,j\right]^T</script></span>. This transformation is called a <em>projection</em> and includes:</p>
+<ul>
+<li>the scale produced by the focal length, with <span><span class="MathJax_Preview">f</span><script type="math/tex">f</script></span> being the distance between the camera center and the plane on which the image is projected.</li>
+<li>the scale factors <span><span class="MathJax_Preview">(m_x,m_y)</span><script type="math/tex">(m_x,m_y)</script></span> relating pixels units to distance units (usually <span><span class="MathJax_Preview">m_x=m_y</span><script type="math/tex">m_x=m_y</script></span> because pixels are squares).</li>
+<li>the translation from the camera <em>principal point</em> to a top-left origin, with <span><span class="MathJax_Preview">(u_0,v_0)</span><script type="math/tex">(u_0,v_0)</script></span> being the position of the <em>principal point</em> expressed in the image coordinates system.</li>
+<li>a skew coefficient <span><span class="MathJax_Preview">\gamma</span><script type="math/tex">\gamma</script></span> between the <span><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span> and <span><span class="MathJax_Preview">y</span><script type="math/tex">y</script></span> axis in the sensor (usually <span><span class="MathJax_Preview">\gamma=0</span><script type="math/tex">\gamma=0</script></span> because pixels are squares).</li>
+</ul>
+<p>Those transformations can be aggregated in one single matrix called <strong>camera matrix</strong>:</p>
+<p><span><span class="MathJax_Preview">K := \left[\begin{matrix}f\cdot m_x &amp; \gamma &amp; u_0 \\ 0 &amp; f\cdot m_y &amp; v_0 \\ 0 &amp; 0 &amp; 1\end{matrix}\right]</span><script type="math/tex; mode=display">K := \left[\begin{matrix}f\cdot m_x & \gamma & u_0 \\ 0 & f\cdot m_y & v_0 \\ 0 & 0 & 1\end{matrix}\right]</script></span></p>
+<p>Therefore,
+<span><span class="MathJax_Preview">\lambda\left[\begin{matrix}i\\ j\\ 1\end{matrix}\right]= \left[\begin{matrix}K_{3\times 3}&amp;{\bf 0}_{3\times 1}\end{matrix}\right]\left[\begin{matrix}x_C\\y_C\\z_C\\1\end{matrix}\right]</span><script type="math/tex; mode=display">\lambda\left[\begin{matrix}i\\ j\\ 1\end{matrix}\right]= \left[\begin{matrix}K_{3\times 3}&{\bf 0}_{3\times 1}\end{matrix}\right]\left[\begin{matrix}x_C\\y_C\\z_C\\1\end{matrix}\right]</script></span></p>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>The width and height of the image are to be added to those parameters and delimits the sensor width and height in pixels.</li>
+<li>When applying the <strong>direct</strong> projection of a given 3D point, different values of <span><span class="MathJax_Preview">\lambda</span><script type="math/tex">\lambda</script></span> will always give the <strong>same</strong> 2D point.</li>
+<li>When applying the <strong>inverse</strong> projection on a given 2D point, different values of <span><span class="MathJax_Preview">\lambda</span><script type="math/tex">\lambda</script></span> will give <strong>different</strong> 3D points.</li>
+</ul>
+<p>This is obvious when simplifying the relation between the two points (The column <span><span class="MathJax_Preview">{\bf 0}_{3\times 1}</span><script type="math/tex">{\bf 0}_{3\times 1}</script></span> cancels the homogenous component of the 3D point):</p>
+<p><span><span class="MathJax_Preview">\lambda\left[\begin{matrix}i\\j\\1\end{matrix}\right]= \left[\begin{matrix}K_{3\times 3}\end{matrix}\right]\left[\begin{matrix}x_C\\y_C\\z_C\end{matrix}\right]</span><script type="math/tex; mode=display">\lambda\left[\begin{matrix}i\\j\\1\end{matrix}\right]= \left[\begin{matrix}K_{3\times 3}\end{matrix}\right]\left[\begin{matrix}x_C\\y_C\\z_C\end{matrix}\right]</script></span></p>
+<p>The 2D vector in homogenous coordinates is not affected by the value of <span><span class="MathJax_Preview">\lambda</span><script type="math/tex">\lambda</script></span>, while the 3D vector is.</p>
+<h2 id="projection-model">Projection model</h2>
+<p>Therefore, by combining
+- the transformation from the world coordinates system to the camera coordinates system (defined by <span><span class="MathJax_Preview">R</span><script type="math/tex">R</script></span> and <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span>)
+- with the projection from the camera coordinates system to the image pixels (defined by <span><span class="MathJax_Preview">K</span><script type="math/tex">K</script></span>),</p>
+<p>We have a projection model allowing to compute the coordinates of a 2D point in the image <span><span class="MathJax_Preview">\left(i,j\right)</span><script type="math/tex">\left(i,j\right)</script></span> from a 3D point in the real world $\left(x,y,z\right)$ described by the matrix <span><span class="MathJax_Preview">P</span><script type="math/tex">P</script></span>:
+<span><span class="MathJax_Preview">P := \left[\begin{matrix}K_{3\times 3}&amp;{\bf 0}_{3\times 1}\end{matrix}\right] \left[\begin{matrix}R_{3\times 3}&amp;T_{3\times 1}\\{\bf 0}_{1\times 3}&amp;1\end{matrix}\right]=K_{3\times 3}\left[\begin{matrix}R_{3\times 3}&amp;T_{3\times 1}\end{matrix}\right]</span><script type="math/tex; mode=display">P := \left[\begin{matrix}K_{3\times 3}&{\bf 0}_{3\times 1}\end{matrix}\right] \left[\begin{matrix}R_{3\times 3}&T_{3\times 1}\\{\bf 0}_{1\times 3}&1\end{matrix}\right]=K_{3\times 3}\left[\begin{matrix}R_{3\times 3}&T_{3\times 1}\end{matrix}\right]</script></span></p>
+<p>The opposite operation requires to invert <span><span class="MathJax_Preview">P</span><script type="math/tex">P</script></span> and is done by pseudo-inverse inversion because <span><span class="MathJax_Preview">P</span><script type="math/tex">P</script></span> is rectangular.</p>
+<h2 id="projection-model-implementation">Projection model implementation</h2>
+<p>This library defines a <a href="./calib3d.calib#Calib">Calib</a> object to represent a calibrated camera. Its constructor receives in arguments the intrinsic and extrinsic parameters:</p>
+<ul>
+<li>image dimensions <code>width</code> and <code>height</code>,</li>
+<li>the translation vector <code>T</code>,</li>
+<li>the rotation matrix <code>R</code>,</li>
+<li>the camera matrix <code>K</code>.</li>
+</ul>
+<p>The method <code>project_3D_to_2D</code> allows to compute the position in the image of a 3D point in the world. The opposite operation <code>project_2D_to_3D</code> requires an additional parameter <code>Z</code> that tells the <span><span class="MathJax_Preview">z</span><script type="math/tex">z</script></span> coordinate of the 3D point.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import pickle
+import numpy as np
+import cv2
+from .points import Point2D, Point3D
+
+__doc__ = r&#34;&#34;&#34;
+
+# Calibrated camera
+
+Camera calibration is based on the pinhole camera model that approximate how lights travels between the scene and the camera sensor. There are two sets of parameters:
+
+- The **extrinsic parameters** define the position of the camera and it&#39;s heading relative to the world coordinates system.
+- The **Intrinsic parameters** define the camera sensor and lens parameters.
+
+They are 3 different coordinates systems:
+
+- The world 3D coordinates system
+- The camera 3D coordinates system
+- The 2D pixel positions where 3D positions are being projected.
+
+
+## Extrinsic parameters
+The extrinsic parameters defines the transformations from the world 3D coordinates \(\left[x_O,y_O,z_O\right]^T\) to the camera 3D coordinates \(\left[x_C,y_C,z_C\right]^T\). The camera 3D coordinates system has the following **conventions**:
+
+- The point \((0,0,0)\) is the center of projection of the camera and is called the *principal point*.
+- The \(z\) axis of the camera points *towards the scene*, the \(x\) axis is along the sensor width pointing towards the right, and the \(y\) axis is along the sensor height pointing towards the bottom.
+
+The camera coordinates system is therefore a *transformation* of the world coordinates systems with:
+
+- A **rotation** defined by a rotation matrix \(R\) using euler angles in a right-hand orthogonal system. The rotation is applied to the world coordinates system to obtain the camera orientation.
+- A **translation** defined by a translation vector \(T\) representing the position of the center of the world in the camera coordinates system !
+
+Hence,
+
+$$\lambda\left[\begin{matrix}x_C\\ y_C\\ z_C\\ 1\end{matrix}\right] = \left[\begin{matrix}
+R_{3\times 3} &amp; T_{3\times 1}\\{\bf 0}_{1\times 3}&amp;1
+\end{matrix}\right] \left[\begin{matrix}x_O\\y_O\\z_O\\1\end{matrix}\right]$$
+
+**Important notes:**
+
+- The rotation matrix represents a passive (or alias) transformation because it&#39;s the coordinates system that rotates and not the objects.
+- Euler angles define a 3D rotation starting with a rotation around \(x\) followed by a rotation around \(y\) followed by a rotation around \(z\) (the order matters).
+- If \(T\) is expressed in the camera coordinate system, the position of the camera expressed in world coordinates system is \(C:=-R^{-1}T = -R^{T}T\) (since \(R\) is a rotation matrix).
+
+
+## Intrinsic parameters
+
+The intrinsic parameters defines the transformation between the 3D coordinates relative to the camera center \(\left[x_C,y_C,z_C\right]^T\) and the 2D coordinates in the camera sensor \(\left[i,j\right]^T\). This transformation is called a *projection* and includes:
+
+- the scale produced by the focal length, with \(f\) being the distance between the camera center and the plane on which the image is projected.
+- the scale factors \((m_x,m_y)\) relating pixels units to distance units (usually \(m_x=m_y\) because pixels are squares).
+- the translation from the camera _principal point_ to a top-left origin, with \((u_0,v_0)\) being the position of the *principal point* expressed in the image coordinates system.
+- a skew coefficient \(\gamma\) between the \(x\) and \(y\) axis in the sensor (usually \(\gamma=0\) because pixels are squares).
+
+Those transformations can be aggregated in one single matrix called **camera matrix**:
+
+$$K := \left[\begin{matrix}f\cdot m_x &amp; \gamma &amp; u_0 \\ 0 &amp; f\cdot m_y &amp; v_0 \\ 0 &amp; 0 &amp; 1\end{matrix}\right]$$
+
+Therefore,
+$$\lambda\left[\begin{matrix}i\\ j\\ 1\end{matrix}\right]= \left[\begin{matrix}K_{3\times 3}&amp;{\bf 0}_{3\times 1}\end{matrix}\right]\left[\begin{matrix}x_C\\y_C\\z_C\\1\end{matrix}\right]$$
+
+**Notes:**
+
+- The width and height of the image are to be added to those parameters and delimits the sensor width and height in pixels.
+- When applying the **direct** projection of a given 3D point, different values of \(\lambda\) will always give the **same** 2D point.
+- When applying the **inverse** projection on a given 2D point, different values of \(\lambda\) will give **different** 3D points.
+
+This is obvious when simplifying the relation between the two points (The column \({\bf 0}_{3\times 1}\) cancels the homogenous component of the 3D point):
+
+$$\lambda\left[\begin{matrix}i\\j\\1\end{matrix}\right]= \left[\begin{matrix}K_{3\times 3}\end{matrix}\right]\left[\begin{matrix}x_C\\y_C\\z_C\end{matrix}\right]$$
+
+The 2D vector in homogenous coordinates is not affected by the value of \(\lambda\), while the 3D vector is.
+
+
+
+## Projection model
+
+Therefore, by combining
+- the transformation from the world coordinates system to the camera coordinates system (defined by \(R\) and \(T\))
+- with the projection from the camera coordinates system to the image pixels (defined by \(K\)),
+
+We have a projection model allowing to compute the coordinates of a 2D point in the image \(\left(i,j\right)\) from a 3D point in the real world $\left(x,y,z\right)$ described by the matrix \(P\):
+$$P := \left[\begin{matrix}K_{3\times 3}&amp;{\bf 0}_{3\times 1}\end{matrix}\right] \left[\begin{matrix}R_{3\times 3}&amp;T_{3\times 1}\\{\bf 0}_{1\times 3}&amp;1\end{matrix}\right]=K_{3\times 3}\left[\begin{matrix}R_{3\times 3}&amp;T_{3\times 1}\end{matrix}\right]$$
+
+The opposite operation requires to invert \(P\) and is done by pseudo-inverse inversion because \(P\) is rectangular.
+
+## Projection model implementation
+
+This library defines a [Calib](./calib3d.calib#Calib) object to represent a calibrated camera. Its constructor receives in arguments the intrinsic and extrinsic parameters:
+
+- image dimensions `width` and `height`,
+- the translation vector `T`,
+- the rotation matrix `R`,
+- the camera matrix `K`.
+
+The method `project_3D_to_2D` allows to compute the position in the image of a 3D point in the world. The opposite operation `project_2D_to_3D` requires an additional parameter `Z` that tells the \(z\) coordinate of the 3D point.
+
+&#34;&#34;&#34;
+
+
+class Calib():
+    def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, kc=None, **_) -&gt; None:
+        &#34;&#34;&#34; Represents a calibrated camera.
+
+        Args:
+            width (int): image width
+            height (int): image height
+            T (np.ndarray): translation vector
+            R (np.ndarray): rotation matrix
+            K (np.ndarray): camera matrix holding intrinsic parameters
+            kc (np.ndarray, optional): lens distortion coefficients. Defaults to None.
+        &#34;&#34;&#34;
+        self.width = int(width)
+        self.height = int(height)
+        self.T = T
+        self.K = K
+        self.kc = np.array((kc if kc is not None else [0,0,0,0,0]), dtype=np.float64)
+        self.R = R
+        self.C = Point3D(-R.T@T)
+        self.P = self.K @ np.hstack((self.R, self.T))
+        self.Pinv = np.linalg.pinv(self.P)
+        self.Kinv = np.linalg.pinv(self.K)
+    def update(self, **kwargs) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Creates another Calib object with the given keyword arguments updated
+            Args:
+                **kwargs : Any of the arguments of `Calib`. Other arguments remain unchanged.
+            Returns:
+                A new Calib object
+        &#34;&#34;&#34;
+        return self.__class__(**{**self.dict, **kwargs})
+
+    @classmethod
+    def from_P(cls, P, width, height) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Create a `Calib` object from a given projection matrix `P` and image dimensions `width` and `height`.
+            Args:
+                P (np.ndarray) : a 3x4 projection matrix
+                width (int) : image width
+                height (int) : image height
+            Returns:
+                A Calib object
+        &#34;&#34;&#34;
+        K, R, T, Rx, Ry, Rz, angles = cv2.decomposeProjectionMatrix(P) # pylint: disable=unused-variable
+        return cls(K=K, R=R, T=Point3D(-R@Point3D(T)), width=width, height=height)
+
+    @classmethod
+    def load(cls, filename) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Loads a Calib object from a file (using the pickle library)
+            Args:
+                filename (str) : the file that stores the Calib object
+            Returns:
+                The `Calib` object previously saved in `filename`.
+        &#34;&#34;&#34;
+        with open(filename, &#34;rb&#34;) as f:
+            return cls(**pickle.load(f))
+
+    @property
+    def dict(self) -&gt; dict:
+        &#34;&#34;&#34; Gets a dictionnary representing the calib object (allowing easier serialization)
+        &#34;&#34;&#34;
+        return {k: getattr(self, k) for k in self.__dict__}
+
+    def dump(self, filename) -&gt; None:
+        &#34;&#34;&#34; Saves the current calib object to a file (using the pickle library)
+            Args:
+                filename (str) : the file that will store the calib object
+        &#34;&#34;&#34;
+        with open(filename, &#34;wb&#34;) as f:
+            pickle.dump(self.dict, f)
+
+    def _project_3D_to_2D_cv2(self, point3D: Point3D):
+        raise BaseException(&#34;This function gives errors when rotating the calibration...&#34;)
+        return Point2D(cv2.projectPoints(point3D, cv2.Rodrigues(self.R)[0], self.T, self.K, self.kc.astype(np.float64))[0][:,0,:].T)
+
+    def project_3D_to_2D(self, point3D: Point3D) -&gt; Point2D:
+        &#34;&#34;&#34; Using the calib object, project a 3D point in the 2D image space.
+            Args:
+                point3D (Point3D) : the 3D point to be projected
+            Returns:
+                The point in the 2D image space on which point3D is projected by calib
+        &#34;&#34;&#34;
+        assert isinstance(point3D, Point3D), &#34;Wrong argument type &#39;{}&#39;. Expected {}&#34;.format(type(point3D), Point3D)
+        point2D_H = self.P @ point3D.H # returns a np.ndarray object
+        point2D_H[2] = point2D_H[2] * np.sign(point2D_H[2]) # correct projection of points being projected behind the camera
+        point2D = Point2D(point2D_H)
+        # avoid distortion of points too far away
+        excluded_points = np.logical_or(np.logical_or(point2D.x &lt; -self.width, point2D.x &gt; 2*self.width),
+                                        np.logical_or(point2D.y &lt; -self.height, point2D.y &gt; 2*self.height))
+        return Point2D(np.where(excluded_points, point2D, self.distort(point2D)))
+
+    def project_2D_to_3D(self, point2D: Point2D, Z: float) -&gt; Point3D:
+        &#34;&#34;&#34; Using the calib object, project a 2D point in the 3D image space.
+            Args:
+                point2D (Point2D) : the 2D point to be projected
+                Z (float) : the Z coordinate of the 3D point
+            Returns:
+                The point in the 3D world for which the z=`Z` and that projects on `point2D`.
+        &#34;&#34;&#34;
+        assert isinstance(point2D, Point2D), &#34;Wrong argument type &#39;{}&#39;. Expected {}&#34;.format(type(point2D), Point2D)
+        point2D = self.rectify(point2D)
+        X = Point3D(self.Pinv @ point2D.H)
+        d = (X - self.C)
+        return find_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)
+
+    def distort(self, point2D: Point2D) -&gt; Point2D:
+        &#34;&#34;&#34; Applies lens distortions to the given `point2D`.
+        &#34;&#34;&#34;
+        if np.any(self.kc):
+            rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
+            # Convert image coordinates to camera coordinates (with z=1 which is the projection plane)
+            point2D = Point2D(self.Kinv @ point2D.H)
+
+            r2 = point2D.x*point2D.x + point2D.y*point2D.y
+            delta = 1 + rad1*r2 + rad2*r2*r2 + rad3*r2*r2*r2
+            dx = np.array([
+                2*tan1*point2D.x*point2D.y + tan2*(r2 + 2*point2D.x*point2D.x),
+                2*tan2*point2D.x*point2D.y + tan1*(r2 + 2*point2D.y*point2D.y)
+            ]).reshape(2, -1)
+
+            point2D = point2D*delta + dx
+            # Convert camera coordinates to pixel coordinates
+            point2D = Point2D(self.K @ point2D.H)
+        return point2D
+
+    def rectify(self, point2D: Point2D) -&gt; Point2D:
+        &#34;&#34;&#34; Removes lens distortion to the given `Point2D`.
+        &#34;&#34;&#34;
+        if np.any(self.kc):
+            rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
+            point2D = Point2D(self.Kinv @ point2D.H) # to camera coordinates
+
+            r2 = point2D.x*point2D.x + point2D.y*point2D.y
+            delta = 1 + rad1*r2 + rad2*r2*r2 + rad3*r2*r2*r2
+            dx = np.array([
+                2*tan1*point2D.x*point2D.y + tan2*(r2 + 2*point2D.x*point2D.x),
+                2*tan2*point2D.x*point2D.y + tan1*(r2 + 2*point2D.y*point2D.y)
+            ]).reshape(2, -1)
+
+            point2D = (point2D - dx)/delta
+            point2D = Point2D(self.K @ point2D.H) # to pixel coordinates
+        return point2D
+
+    def crop(self, x_slice, y_slice) -&gt; &#39;Calib&#39;:
+        x0 = x_slice.start
+        y0 = y_slice.start
+        width = x_slice.stop - x_slice.start
+        height = y_slice.stop - y_slice.start
+        T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
+        return self.update(width=width, height=height, K=T@self.K)
+
+    def scale(self, output_width, output_height) -&gt; &#39;Calib&#39;:
+        sx = output_width/self.width
+        sy = output_height/self.height
+        S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
+        return self.update(width=output_width, height=output_height, K=S@self.K)
+
+    def flip(self) -&gt; &#39;Calib&#39;:
+        F = np.array([[-1, 0, self.width-1], [0, 1, 0], [0, 0, 1]])
+        return self.update(K=F@self.K)
+
+    def rotate(self, angle) -&gt; &#39;Calib&#39;:
+        if angle == 0:
+            return self
+        A, new_width, new_height = compute_rotate(self.width, self.height, angle)
+        return self.update(K=A@self.K, width=new_width, height=new_height)
+
+    def compute_length2D(self, length3D: float, point3D: Point3D) -&gt; np.ndarray:
+        &#34;&#34;&#34; Returns the length in pixel of a 3D length at point3D
+        &#34;&#34;&#34;
+        assert np.isscalar(length3D), f&#34;This function expects a scalar `length3D` argument. Received {length3D}&#34;
+        point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
+        point3D_c.x += length3D # add the 3D length to one of the componant
+        point2D = self.distort(Point2D(self.K @ point3D_c)) # go in the 2D world
+        length = np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=0)
+        return length#float(length) if point3D.shape[1] == 1 else length
+
+    def projects_in(self, point3D: Point3D) -&gt; np.ndarray:
+        &#34;&#34;&#34; Check wether point3D projects into the `Calib` object.
+            Returns `True` where for points that projects in the image and `False` otherwise.
+        &#34;&#34;&#34;
+        point2D = self.project_3D_to_2D(point3D)
+        cond = np.stack((point2D.x &gt;= 0, point2D.y &gt;= 0, point2D.x &lt;= self.width, point2D.y &lt;= self.height))
+        return np.all(cond, axis=0)
+
+def find_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
+    &#34;&#34;&#34; Finds the intersection between a line and a plane.
+        Arguments:
+            C - a Point3D of a point on the line
+            d - the direction-vector of the line
+            P - a Point3D on the plane
+            n - the normal vector of the plane
+        Returns the Point3D at the intersection between the line and the plane.
+    &#34;&#34;&#34;
+    d = d/np.linalg.norm(d, axis=0)
+    dist = ((P-C).T @ n) / (d.T @ n)  # Distance between plane z=Z and camera
+    return Point3D(C + dist.T*d)
+
+def compute_rotate(width, height, angle):
+    &#34;&#34;&#34; Computes rotation matrix and new width and height for a rotation of angle degrees of a widthxheight image.
+    &#34;&#34;&#34;
+    # Convert the OpenCV 3x2 rotation matrix to 3x3
+    R = np.eye(3)
+    R[0:2,:] = cv2.getRotationMatrix2D((width/2, height/2), angle, 1.0)
+    R2D = R[0:2,0:2]
+
+    # Obtain the rotated coordinates of the image corners
+    rotated_coords = [
+        np.array([-width/2,  height/2]) @ R2D,
+        np.array([ width/2,  height/2]) @ R2D,
+        np.array([-width/2, -height/2]) @ R2D,
+        np.array([ width/2, -height/2]) @ R2D
+    ]
+
+    # Find the size of the new image
+    right_bound = max([pt[0] for pt in rotated_coords])
+    left_bound = min([pt[0] for pt in rotated_coords])
+    top_bound = max([pt[1] for pt in rotated_coords])
+    bot_bound = min([pt[1] for pt in rotated_coords])
+
+    new_width = int(abs(right_bound - left_bound))
+    new_height = int(abs(top_bound - bot_bound))
+
+    # We require a translation matrix to keep the image centred
+    T = np.array([
+        [1, 0, new_width/2 - width/2],
+        [0, 1, new_height/2 - height/2],
+        [0, 0, 1]
+    ])
+    return T@R, new_width, new_height
+
+
+def rotate_image(image, angle):
+    &#34;&#34;&#34; Rotates an image around its center by the given angle (in degrees).
+        The returned image will be large enough to hold the entire new image, with a black background
+    &#34;&#34;&#34;
+    height, width = image.shape[0:2]
+    A, new_width, new_height = compute_rotate(width, height, angle)
+    return cv2.warpAffine(image, A[0:2,:], (new_width, new_height), flags=cv2.INTER_LINEAR)
+
+def parameters_to_affine_transform(angle: float, x_slice: slice, y_slice: slice,
+    output_shape: tuple, do_flip: bool=False):
+    &#34;&#34;&#34; Compute the affine transformation matrix that correspond to a
+        - horizontal flip if `do_flip` is `True`, followed by a
+        - rotation of `angle` degrees around image center, followed by a
+        - crop defined by `x_slice` and `y_slice`, followed by a
+        - scale to recover `output_shape`.
+    &#34;&#34;&#34;
+    assert not do_flip, &#34;There is a bug with random flip&#34;
+    R = np.eye(3)
+    center = ((y_slice.start + y_slice.stop)/2, (x_slice.start + x_slice.stop)/2)
+    R[0:2,:] = cv2.getRotationMatrix2D(center, angle, 1.0)
+
+    x0 = x_slice.start
+    y0 = y_slice.start
+    width = x_slice.stop - x_slice.start
+    height = y_slice.stop - y_slice.start
+    T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
+
+    sx = output_shape[0]/width
+    sy = output_shape[1]/height
+    S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
+
+    f = np.random.randint(0,2)*2-1 if do_flip else 1 # random sample in {-1,1}
+    F = np.array([[f, 0, 0], [0, 1, 0], [0, 0, 1]])
+
+    return S@T@R@F
+
+
+def compute_rotation_matrix(point3D: Point3D, camera3D: Point3D):
+    &#34;&#34;&#34; Computes the rotation matrix of a camera in `camera3D` pointing
+        towards the point `point3D`. Both are expressed in word coordinates.
+        The convention is that Z is pointing down.
+        Credits: François Ledent
+    &#34;&#34;&#34;
+    point3D = camera3D - point3D
+    x, y, z = point3D.x, point3D.y, point3D.z
+    d = np.sqrt(x**2 + y**2)
+    D = np.sqrt(x**2 + y**2 + z**2)
+    h = d / D
+    l = z / D
+
+    # camera basis `B` expressed in the world basis `O`
+    _x = np.array([y / d, -x / d, 0])
+    _y = np.array([- l * x / d, - l * y / d, h])
+    _z = np.array([- h * x / d, - h * y / d, -l])
+    B = np.stack((_x, _y, _z), axis=-1)
+
+    # `O = R @ B` (where `O` := `np.identity(3)`)
+    R = B.T # inv(B) == B.T since R is a rotation matrix
+    return R</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="calib3d.calib.compute_rotate"><code class="name flex">
+<span>def <span class="ident">compute_rotate</span></span>(<span>width, height, angle)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Computes rotation matrix and new width and height for a rotation of angle degrees of a widthxheight image.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def compute_rotate(width, height, angle):
+    &#34;&#34;&#34; Computes rotation matrix and new width and height for a rotation of angle degrees of a widthxheight image.
+    &#34;&#34;&#34;
+    # Convert the OpenCV 3x2 rotation matrix to 3x3
+    R = np.eye(3)
+    R[0:2,:] = cv2.getRotationMatrix2D((width/2, height/2), angle, 1.0)
+    R2D = R[0:2,0:2]
+
+    # Obtain the rotated coordinates of the image corners
+    rotated_coords = [
+        np.array([-width/2,  height/2]) @ R2D,
+        np.array([ width/2,  height/2]) @ R2D,
+        np.array([-width/2, -height/2]) @ R2D,
+        np.array([ width/2, -height/2]) @ R2D
+    ]
+
+    # Find the size of the new image
+    right_bound = max([pt[0] for pt in rotated_coords])
+    left_bound = min([pt[0] for pt in rotated_coords])
+    top_bound = max([pt[1] for pt in rotated_coords])
+    bot_bound = min([pt[1] for pt in rotated_coords])
+
+    new_width = int(abs(right_bound - left_bound))
+    new_height = int(abs(top_bound - bot_bound))
+
+    # We require a translation matrix to keep the image centred
+    T = np.array([
+        [1, 0, new_width/2 - width/2],
+        [0, 1, new_height/2 - height/2],
+        [0, 0, 1]
+    ])
+    return T@R, new_width, new_height</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.compute_rotation_matrix"><code class="name flex">
+<span>def <span class="ident">compute_rotation_matrix</span></span>(<span>point3D: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>, camera3D: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Computes the rotation matrix of a camera in <code>camera3D</code> pointing
+towards the point <code>point3D</code>. Both are expressed in word coordinates.
+The convention is that Z is pointing down.
+Credits: François Ledent</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def compute_rotation_matrix(point3D: Point3D, camera3D: Point3D):
+    &#34;&#34;&#34; Computes the rotation matrix of a camera in `camera3D` pointing
+        towards the point `point3D`. Both are expressed in word coordinates.
+        The convention is that Z is pointing down.
+        Credits: François Ledent
+    &#34;&#34;&#34;
+    point3D = camera3D - point3D
+    x, y, z = point3D.x, point3D.y, point3D.z
+    d = np.sqrt(x**2 + y**2)
+    D = np.sqrt(x**2 + y**2 + z**2)
+    h = d / D
+    l = z / D
+
+    # camera basis `B` expressed in the world basis `O`
+    _x = np.array([y / d, -x / d, 0])
+    _y = np.array([- l * x / d, - l * y / d, h])
+    _z = np.array([- h * x / d, - h * y / d, -l])
+    B = np.stack((_x, _y, _z), axis=-1)
+
+    # `O = R @ B` (where `O` := `np.identity(3)`)
+    R = B.T # inv(B) == B.T since R is a rotation matrix
+    return R</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.find_intersection"><code class="name flex">
+<span>def <span class="ident">find_intersection</span></span>(<span>C: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>, d, P: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>, n) ‑> <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds the intersection between a line and a plane.</p>
+<h2 id="arguments">Arguments</h2>
+<p>C - a Point3D of a point on the line
+d - the direction-vector of the line
+P - a Point3D on the plane
+n - the normal vector of the plane
+Returns the Point3D at the intersection between the line and the plane.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
+    &#34;&#34;&#34; Finds the intersection between a line and a plane.
+        Arguments:
+            C - a Point3D of a point on the line
+            d - the direction-vector of the line
+            P - a Point3D on the plane
+            n - the normal vector of the plane
+        Returns the Point3D at the intersection between the line and the plane.
+    &#34;&#34;&#34;
+    d = d/np.linalg.norm(d, axis=0)
+    dist = ((P-C).T @ n) / (d.T @ n)  # Distance between plane z=Z and camera
+    return Point3D(C + dist.T*d)</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.parameters_to_affine_transform"><code class="name flex">
+<span>def <span class="ident">parameters_to_affine_transform</span></span>(<span>angle: float, x_slice: slice, y_slice: slice, output_shape: tuple, do_flip: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the affine transformation matrix that correspond to a
+- horizontal flip if <code>do_flip</code> is <code>True</code>, followed by a
+- rotation of <code>angle</code> degrees around image center, followed by a
+- crop defined by <code>x_slice</code> and <code>y_slice</code>, followed by a
+- scale to recover <code>output_shape</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def parameters_to_affine_transform(angle: float, x_slice: slice, y_slice: slice,
+    output_shape: tuple, do_flip: bool=False):
+    &#34;&#34;&#34; Compute the affine transformation matrix that correspond to a
+        - horizontal flip if `do_flip` is `True`, followed by a
+        - rotation of `angle` degrees around image center, followed by a
+        - crop defined by `x_slice` and `y_slice`, followed by a
+        - scale to recover `output_shape`.
+    &#34;&#34;&#34;
+    assert not do_flip, &#34;There is a bug with random flip&#34;
+    R = np.eye(3)
+    center = ((y_slice.start + y_slice.stop)/2, (x_slice.start + x_slice.stop)/2)
+    R[0:2,:] = cv2.getRotationMatrix2D(center, angle, 1.0)
+
+    x0 = x_slice.start
+    y0 = y_slice.start
+    width = x_slice.stop - x_slice.start
+    height = y_slice.stop - y_slice.start
+    T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
+
+    sx = output_shape[0]/width
+    sy = output_shape[1]/height
+    S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
+
+    f = np.random.randint(0,2)*2-1 if do_flip else 1 # random sample in {-1,1}
+    F = np.array([[f, 0, 0], [0, 1, 0], [0, 0, 1]])
+
+    return S@T@R@F</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.rotate_image"><code class="name flex">
+<span>def <span class="ident">rotate_image</span></span>(<span>image, angle)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Rotates an image around its center by the given angle (in degrees).
+The returned image will be large enough to hold the entire new image, with a black background</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rotate_image(image, angle):
+    &#34;&#34;&#34; Rotates an image around its center by the given angle (in degrees).
+        The returned image will be large enough to hold the entire new image, with a black background
+    &#34;&#34;&#34;
+    height, width = image.shape[0:2]
+    A, new_width, new_height = compute_rotate(width, height, angle)
+    return cv2.warpAffine(image, A[0:2,:], (new_width, new_height), flags=cv2.INTER_LINEAR)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="calib3d.calib.Calib"><code class="flex name class">
+<span>class <span class="ident">Calib</span></span>
+<span>(</span><span>*, width: int, height: int, T: numpy.ndarray, R: numpy.ndarray, K: numpy.ndarray, kc=None, **_)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Represents a calibrated camera.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>width</code></strong> :&ensp;<code>int</code></dt>
+<dd>image width</dd>
+<dt><strong><code>height</code></strong> :&ensp;<code>int</code></dt>
+<dd>image height</dd>
+<dt><strong><code>T</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>translation vector</dd>
+<dt><strong><code>R</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>rotation matrix</dd>
+<dt><strong><code>K</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>camera matrix holding intrinsic parameters</dd>
+<dt><strong><code>kc</code></strong> :&ensp;<code>np.ndarray</code>, optional</dt>
+<dd>lens distortion coefficients. Defaults to None.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Calib():
+    def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, kc=None, **_) -&gt; None:
+        &#34;&#34;&#34; Represents a calibrated camera.
+
+        Args:
+            width (int): image width
+            height (int): image height
+            T (np.ndarray): translation vector
+            R (np.ndarray): rotation matrix
+            K (np.ndarray): camera matrix holding intrinsic parameters
+            kc (np.ndarray, optional): lens distortion coefficients. Defaults to None.
+        &#34;&#34;&#34;
+        self.width = int(width)
+        self.height = int(height)
+        self.T = T
+        self.K = K
+        self.kc = np.array((kc if kc is not None else [0,0,0,0,0]), dtype=np.float64)
+        self.R = R
+        self.C = Point3D(-R.T@T)
+        self.P = self.K @ np.hstack((self.R, self.T))
+        self.Pinv = np.linalg.pinv(self.P)
+        self.Kinv = np.linalg.pinv(self.K)
+    def update(self, **kwargs) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Creates another Calib object with the given keyword arguments updated
+            Args:
+                **kwargs : Any of the arguments of `Calib`. Other arguments remain unchanged.
+            Returns:
+                A new Calib object
+        &#34;&#34;&#34;
+        return self.__class__(**{**self.dict, **kwargs})
+
+    @classmethod
+    def from_P(cls, P, width, height) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Create a `Calib` object from a given projection matrix `P` and image dimensions `width` and `height`.
+            Args:
+                P (np.ndarray) : a 3x4 projection matrix
+                width (int) : image width
+                height (int) : image height
+            Returns:
+                A Calib object
+        &#34;&#34;&#34;
+        K, R, T, Rx, Ry, Rz, angles = cv2.decomposeProjectionMatrix(P) # pylint: disable=unused-variable
+        return cls(K=K, R=R, T=Point3D(-R@Point3D(T)), width=width, height=height)
+
+    @classmethod
+    def load(cls, filename) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Loads a Calib object from a file (using the pickle library)
+            Args:
+                filename (str) : the file that stores the Calib object
+            Returns:
+                The `Calib` object previously saved in `filename`.
+        &#34;&#34;&#34;
+        with open(filename, &#34;rb&#34;) as f:
+            return cls(**pickle.load(f))
+
+    @property
+    def dict(self) -&gt; dict:
+        &#34;&#34;&#34; Gets a dictionnary representing the calib object (allowing easier serialization)
+        &#34;&#34;&#34;
+        return {k: getattr(self, k) for k in self.__dict__}
+
+    def dump(self, filename) -&gt; None:
+        &#34;&#34;&#34; Saves the current calib object to a file (using the pickle library)
+            Args:
+                filename (str) : the file that will store the calib object
+        &#34;&#34;&#34;
+        with open(filename, &#34;wb&#34;) as f:
+            pickle.dump(self.dict, f)
+
+    def _project_3D_to_2D_cv2(self, point3D: Point3D):
+        raise BaseException(&#34;This function gives errors when rotating the calibration...&#34;)
+        return Point2D(cv2.projectPoints(point3D, cv2.Rodrigues(self.R)[0], self.T, self.K, self.kc.astype(np.float64))[0][:,0,:].T)
+
+    def project_3D_to_2D(self, point3D: Point3D) -&gt; Point2D:
+        &#34;&#34;&#34; Using the calib object, project a 3D point in the 2D image space.
+            Args:
+                point3D (Point3D) : the 3D point to be projected
+            Returns:
+                The point in the 2D image space on which point3D is projected by calib
+        &#34;&#34;&#34;
+        assert isinstance(point3D, Point3D), &#34;Wrong argument type &#39;{}&#39;. Expected {}&#34;.format(type(point3D), Point3D)
+        point2D_H = self.P @ point3D.H # returns a np.ndarray object
+        point2D_H[2] = point2D_H[2] * np.sign(point2D_H[2]) # correct projection of points being projected behind the camera
+        point2D = Point2D(point2D_H)
+        # avoid distortion of points too far away
+        excluded_points = np.logical_or(np.logical_or(point2D.x &lt; -self.width, point2D.x &gt; 2*self.width),
+                                        np.logical_or(point2D.y &lt; -self.height, point2D.y &gt; 2*self.height))
+        return Point2D(np.where(excluded_points, point2D, self.distort(point2D)))
+
+    def project_2D_to_3D(self, point2D: Point2D, Z: float) -&gt; Point3D:
+        &#34;&#34;&#34; Using the calib object, project a 2D point in the 3D image space.
+            Args:
+                point2D (Point2D) : the 2D point to be projected
+                Z (float) : the Z coordinate of the 3D point
+            Returns:
+                The point in the 3D world for which the z=`Z` and that projects on `point2D`.
+        &#34;&#34;&#34;
+        assert isinstance(point2D, Point2D), &#34;Wrong argument type &#39;{}&#39;. Expected {}&#34;.format(type(point2D), Point2D)
+        point2D = self.rectify(point2D)
+        X = Point3D(self.Pinv @ point2D.H)
+        d = (X - self.C)
+        return find_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)
+
+    def distort(self, point2D: Point2D) -&gt; Point2D:
+        &#34;&#34;&#34; Applies lens distortions to the given `point2D`.
+        &#34;&#34;&#34;
+        if np.any(self.kc):
+            rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
+            # Convert image coordinates to camera coordinates (with z=1 which is the projection plane)
+            point2D = Point2D(self.Kinv @ point2D.H)
+
+            r2 = point2D.x*point2D.x + point2D.y*point2D.y
+            delta = 1 + rad1*r2 + rad2*r2*r2 + rad3*r2*r2*r2
+            dx = np.array([
+                2*tan1*point2D.x*point2D.y + tan2*(r2 + 2*point2D.x*point2D.x),
+                2*tan2*point2D.x*point2D.y + tan1*(r2 + 2*point2D.y*point2D.y)
+            ]).reshape(2, -1)
+
+            point2D = point2D*delta + dx
+            # Convert camera coordinates to pixel coordinates
+            point2D = Point2D(self.K @ point2D.H)
+        return point2D
+
+    def rectify(self, point2D: Point2D) -&gt; Point2D:
+        &#34;&#34;&#34; Removes lens distortion to the given `Point2D`.
+        &#34;&#34;&#34;
+        if np.any(self.kc):
+            rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
+            point2D = Point2D(self.Kinv @ point2D.H) # to camera coordinates
+
+            r2 = point2D.x*point2D.x + point2D.y*point2D.y
+            delta = 1 + rad1*r2 + rad2*r2*r2 + rad3*r2*r2*r2
+            dx = np.array([
+                2*tan1*point2D.x*point2D.y + tan2*(r2 + 2*point2D.x*point2D.x),
+                2*tan2*point2D.x*point2D.y + tan1*(r2 + 2*point2D.y*point2D.y)
+            ]).reshape(2, -1)
+
+            point2D = (point2D - dx)/delta
+            point2D = Point2D(self.K @ point2D.H) # to pixel coordinates
+        return point2D
+
+    def crop(self, x_slice, y_slice) -&gt; &#39;Calib&#39;:
+        x0 = x_slice.start
+        y0 = y_slice.start
+        width = x_slice.stop - x_slice.start
+        height = y_slice.stop - y_slice.start
+        T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
+        return self.update(width=width, height=height, K=T@self.K)
+
+    def scale(self, output_width, output_height) -&gt; &#39;Calib&#39;:
+        sx = output_width/self.width
+        sy = output_height/self.height
+        S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
+        return self.update(width=output_width, height=output_height, K=S@self.K)
+
+    def flip(self) -&gt; &#39;Calib&#39;:
+        F = np.array([[-1, 0, self.width-1], [0, 1, 0], [0, 0, 1]])
+        return self.update(K=F@self.K)
+
+    def rotate(self, angle) -&gt; &#39;Calib&#39;:
+        if angle == 0:
+            return self
+        A, new_width, new_height = compute_rotate(self.width, self.height, angle)
+        return self.update(K=A@self.K, width=new_width, height=new_height)
+
+    def compute_length2D(self, length3D: float, point3D: Point3D) -&gt; np.ndarray:
+        &#34;&#34;&#34; Returns the length in pixel of a 3D length at point3D
+        &#34;&#34;&#34;
+        assert np.isscalar(length3D), f&#34;This function expects a scalar `length3D` argument. Received {length3D}&#34;
+        point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
+        point3D_c.x += length3D # add the 3D length to one of the componant
+        point2D = self.distort(Point2D(self.K @ point3D_c)) # go in the 2D world
+        length = np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=0)
+        return length#float(length) if point3D.shape[1] == 1 else length
+
+    def projects_in(self, point3D: Point3D) -&gt; np.ndarray:
+        &#34;&#34;&#34; Check wether point3D projects into the `Calib` object.
+            Returns `True` where for points that projects in the image and `False` otherwise.
+        &#34;&#34;&#34;
+        point2D = self.project_3D_to_2D(point3D)
+        cond = np.stack((point2D.x &gt;= 0, point2D.y &gt;= 0, point2D.x &lt;= self.width, point2D.y &lt;= self.height))
+        return np.all(cond, axis=0)</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="calib3d.calib.Calib.from_P"><code class="name flex">
+<span>def <span class="ident">from_P</span></span>(<span>P, width, height) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a <code><a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></code> object from a given projection matrix <code>P</code> and image dimensions <code>width</code> and <code>height</code>.</p>
+<h2 id="args">Args</h2>
+<p>P (np.ndarray) : a 3x4 projection matrix
+width (int) : image width
+height (int) : image height</p>
+<h2 id="returns">Returns</h2>
+<p>A Calib object</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_P(cls, P, width, height) -&gt; &#39;Calib&#39;:
+    &#34;&#34;&#34; Create a `Calib` object from a given projection matrix `P` and image dimensions `width` and `height`.
+        Args:
+            P (np.ndarray) : a 3x4 projection matrix
+            width (int) : image width
+            height (int) : image height
+        Returns:
+            A Calib object
+    &#34;&#34;&#34;
+    K, R, T, Rx, Ry, Rz, angles = cv2.decomposeProjectionMatrix(P) # pylint: disable=unused-variable
+    return cls(K=K, R=R, T=Point3D(-R@Point3D(T)), width=width, height=height)</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.load"><code class="name flex">
+<span>def <span class="ident">load</span></span>(<span>filename) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Loads a Calib object from a file (using the pickle library)</p>
+<h2 id="args">Args</h2>
+<p>filename (str) : the file that stores the Calib object</p>
+<h2 id="returns">Returns</h2>
+<p>The <code><a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></code> object previously saved in <code>filename</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def load(cls, filename) -&gt; &#39;Calib&#39;:
+    &#34;&#34;&#34; Loads a Calib object from a file (using the pickle library)
+        Args:
+            filename (str) : the file that stores the Calib object
+        Returns:
+            The `Calib` object previously saved in `filename`.
+    &#34;&#34;&#34;
+    with open(filename, &#34;rb&#34;) as f:
+        return cls(**pickle.load(f))</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="calib3d.calib.Calib.dict"><code class="name">var <span class="ident">dict</span> : dict</code></dt>
+<dd>
+<div class="desc"><p>Gets a dictionnary representing the calib object (allowing easier serialization)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def dict(self) -&gt; dict:
+    &#34;&#34;&#34; Gets a dictionnary representing the calib object (allowing easier serialization)
+    &#34;&#34;&#34;
+    return {k: getattr(self, k) for k in self.__dict__}</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="calib3d.calib.Calib.compute_length2D"><code class="name flex">
+<span>def <span class="ident">compute_length2D</span></span>(<span>self, length3D: float, point3D: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the length in pixel of a 3D length at point3D</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def compute_length2D(self, length3D: float, point3D: Point3D) -&gt; np.ndarray:
+    &#34;&#34;&#34; Returns the length in pixel of a 3D length at point3D
+    &#34;&#34;&#34;
+    assert np.isscalar(length3D), f&#34;This function expects a scalar `length3D` argument. Received {length3D}&#34;
+    point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
+    point3D_c.x += length3D # add the 3D length to one of the componant
+    point2D = self.distort(Point2D(self.K @ point3D_c)) # go in the 2D world
+    length = np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=0)
+    return length#float(length) if point3D.shape[1] == 1 else length</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.crop"><code class="name flex">
+<span>def <span class="ident">crop</span></span>(<span>self, x_slice, y_slice) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def crop(self, x_slice, y_slice) -&gt; &#39;Calib&#39;:
+    x0 = x_slice.start
+    y0 = y_slice.start
+    width = x_slice.stop - x_slice.start
+    height = y_slice.stop - y_slice.start
+    T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
+    return self.update(width=width, height=height, K=T@self.K)</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.distort"><code class="name flex">
+<span>def <span class="ident">distort</span></span>(<span>self, point2D: <a title="calib3d.points.Point2D" href="points.html#calib3d.points.Point2D">Point2D</a>) ‑> <a title="calib3d.points.Point2D" href="points.html#calib3d.points.Point2D">Point2D</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Applies lens distortions to the given <code>point2D</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def distort(self, point2D: Point2D) -&gt; Point2D:
+    &#34;&#34;&#34; Applies lens distortions to the given `point2D`.
+    &#34;&#34;&#34;
+    if np.any(self.kc):
+        rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
+        # Convert image coordinates to camera coordinates (with z=1 which is the projection plane)
+        point2D = Point2D(self.Kinv @ point2D.H)
+
+        r2 = point2D.x*point2D.x + point2D.y*point2D.y
+        delta = 1 + rad1*r2 + rad2*r2*r2 + rad3*r2*r2*r2
+        dx = np.array([
+            2*tan1*point2D.x*point2D.y + tan2*(r2 + 2*point2D.x*point2D.x),
+            2*tan2*point2D.x*point2D.y + tan1*(r2 + 2*point2D.y*point2D.y)
+        ]).reshape(2, -1)
+
+        point2D = point2D*delta + dx
+        # Convert camera coordinates to pixel coordinates
+        point2D = Point2D(self.K @ point2D.H)
+    return point2D</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.dump"><code class="name flex">
+<span>def <span class="ident">dump</span></span>(<span>self, filename) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Saves the current calib object to a file (using the pickle library)</p>
+<h2 id="args">Args</h2>
+<p>filename (str) : the file that will store the calib object</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dump(self, filename) -&gt; None:
+    &#34;&#34;&#34; Saves the current calib object to a file (using the pickle library)
+        Args:
+            filename (str) : the file that will store the calib object
+    &#34;&#34;&#34;
+    with open(filename, &#34;wb&#34;) as f:
+        pickle.dump(self.dict, f)</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.flip"><code class="name flex">
+<span>def <span class="ident">flip</span></span>(<span>self) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def flip(self) -&gt; &#39;Calib&#39;:
+    F = np.array([[-1, 0, self.width-1], [0, 1, 0], [0, 0, 1]])
+    return self.update(K=F@self.K)</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.project_2D_to_3D"><code class="name flex">
+<span>def <span class="ident">project_2D_to_3D</span></span>(<span>self, point2D: <a title="calib3d.points.Point2D" href="points.html#calib3d.points.Point2D">Point2D</a>, Z: float) ‑> <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Using the calib object, project a 2D point in the 3D image space.</p>
+<h2 id="args">Args</h2>
+<p>point2D (Point2D) : the 2D point to be projected
+Z (float) : the Z coordinate of the 3D point</p>
+<h2 id="returns">Returns</h2>
+<p>The point in the 3D world for which the z=<code>Z</code> and that projects on <code>point2D</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def project_2D_to_3D(self, point2D: Point2D, Z: float) -&gt; Point3D:
+    &#34;&#34;&#34; Using the calib object, project a 2D point in the 3D image space.
+        Args:
+            point2D (Point2D) : the 2D point to be projected
+            Z (float) : the Z coordinate of the 3D point
+        Returns:
+            The point in the 3D world for which the z=`Z` and that projects on `point2D`.
+    &#34;&#34;&#34;
+    assert isinstance(point2D, Point2D), &#34;Wrong argument type &#39;{}&#39;. Expected {}&#34;.format(type(point2D), Point2D)
+    point2D = self.rectify(point2D)
+    X = Point3D(self.Pinv @ point2D.H)
+    d = (X - self.C)
+    return find_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.project_3D_to_2D"><code class="name flex">
+<span>def <span class="ident">project_3D_to_2D</span></span>(<span>self, point3D: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>) ‑> <a title="calib3d.points.Point2D" href="points.html#calib3d.points.Point2D">Point2D</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Using the calib object, project a 3D point in the 2D image space.</p>
+<h2 id="args">Args</h2>
+<p>point3D (Point3D) : the 3D point to be projected</p>
+<h2 id="returns">Returns</h2>
+<p>The point in the 2D image space on which point3D is projected by calib</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def project_3D_to_2D(self, point3D: Point3D) -&gt; Point2D:
+    &#34;&#34;&#34; Using the calib object, project a 3D point in the 2D image space.
+        Args:
+            point3D (Point3D) : the 3D point to be projected
+        Returns:
+            The point in the 2D image space on which point3D is projected by calib
+    &#34;&#34;&#34;
+    assert isinstance(point3D, Point3D), &#34;Wrong argument type &#39;{}&#39;. Expected {}&#34;.format(type(point3D), Point3D)
+    point2D_H = self.P @ point3D.H # returns a np.ndarray object
+    point2D_H[2] = point2D_H[2] * np.sign(point2D_H[2]) # correct projection of points being projected behind the camera
+    point2D = Point2D(point2D_H)
+    # avoid distortion of points too far away
+    excluded_points = np.logical_or(np.logical_or(point2D.x &lt; -self.width, point2D.x &gt; 2*self.width),
+                                    np.logical_or(point2D.y &lt; -self.height, point2D.y &gt; 2*self.height))
+    return Point2D(np.where(excluded_points, point2D, self.distort(point2D)))</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.projects_in"><code class="name flex">
+<span>def <span class="ident">projects_in</span></span>(<span>self, point3D: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check wether point3D projects into the <code><a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></code> object.
+Returns <code>True</code> where for points that projects in the image and <code>False</code> otherwise.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def projects_in(self, point3D: Point3D) -&gt; np.ndarray:
+    &#34;&#34;&#34; Check wether point3D projects into the `Calib` object.
+        Returns `True` where for points that projects in the image and `False` otherwise.
+    &#34;&#34;&#34;
+    point2D = self.project_3D_to_2D(point3D)
+    cond = np.stack((point2D.x &gt;= 0, point2D.y &gt;= 0, point2D.x &lt;= self.width, point2D.y &lt;= self.height))
+    return np.all(cond, axis=0)</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.rectify"><code class="name flex">
+<span>def <span class="ident">rectify</span></span>(<span>self, point2D: <a title="calib3d.points.Point2D" href="points.html#calib3d.points.Point2D">Point2D</a>) ‑> <a title="calib3d.points.Point2D" href="points.html#calib3d.points.Point2D">Point2D</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Removes lens distortion to the given <code>Point2D</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rectify(self, point2D: Point2D) -&gt; Point2D:
+    &#34;&#34;&#34; Removes lens distortion to the given `Point2D`.
+    &#34;&#34;&#34;
+    if np.any(self.kc):
+        rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
+        point2D = Point2D(self.Kinv @ point2D.H) # to camera coordinates
+
+        r2 = point2D.x*point2D.x + point2D.y*point2D.y
+        delta = 1 + rad1*r2 + rad2*r2*r2 + rad3*r2*r2*r2
+        dx = np.array([
+            2*tan1*point2D.x*point2D.y + tan2*(r2 + 2*point2D.x*point2D.x),
+            2*tan2*point2D.x*point2D.y + tan1*(r2 + 2*point2D.y*point2D.y)
+        ]).reshape(2, -1)
+
+        point2D = (point2D - dx)/delta
+        point2D = Point2D(self.K @ point2D.H) # to pixel coordinates
+    return point2D</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.rotate"><code class="name flex">
+<span>def <span class="ident">rotate</span></span>(<span>self, angle) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rotate(self, angle) -&gt; &#39;Calib&#39;:
+    if angle == 0:
+        return self
+    A, new_width, new_height = compute_rotate(self.width, self.height, angle)
+    return self.update(K=A@self.K, width=new_width, height=new_height)</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.scale"><code class="name flex">
+<span>def <span class="ident">scale</span></span>(<span>self, output_width, output_height) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def scale(self, output_width, output_height) -&gt; &#39;Calib&#39;:
+    sx = output_width/self.width
+    sy = output_height/self.height
+    S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
+    return self.update(width=output_width, height=output_height, K=S@self.K)</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.update"><code class="name flex">
+<span>def <span class="ident">update</span></span>(<span>self, **kwargs) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Creates another Calib object with the given keyword arguments updated</p>
+<h2 id="args">Args</h2>
+<p>**kwargs : Any of the arguments of <code><a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></code>. Other arguments remain unchanged.</p>
+<h2 id="returns">Returns</h2>
+<p>A new Calib object</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update(self, **kwargs) -&gt; &#39;Calib&#39;:
+    &#34;&#34;&#34; Creates another Calib object with the given keyword arguments updated
+        Args:
+            **kwargs : Any of the arguments of `Calib`. Other arguments remain unchanged.
+        Returns:
+            A new Calib object
+    &#34;&#34;&#34;
+    return self.__class__(**{**self.dict, **kwargs})</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul>
+<li><a href="#calibrated-camera">Calibrated camera</a><ul>
+<li><a href="#extrinsic-parameters">Extrinsic parameters</a></li>
+<li><a href="#intrinsic-parameters">Intrinsic parameters</a></li>
+<li><a href="#projection-model">Projection model</a></li>
+<li><a href="#projection-model-implementation">Projection model implementation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="calib3d" href="index.html">calib3d</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="calib3d.calib.compute_rotate" href="#calib3d.calib.compute_rotate">compute_rotate</a></code></li>
+<li><code><a title="calib3d.calib.compute_rotation_matrix" href="#calib3d.calib.compute_rotation_matrix">compute_rotation_matrix</a></code></li>
+<li><code><a title="calib3d.calib.find_intersection" href="#calib3d.calib.find_intersection">find_intersection</a></code></li>
+<li><code><a title="calib3d.calib.parameters_to_affine_transform" href="#calib3d.calib.parameters_to_affine_transform">parameters_to_affine_transform</a></code></li>
+<li><code><a title="calib3d.calib.rotate_image" href="#calib3d.calib.rotate_image">rotate_image</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></code></h4>
+<ul class="two-column">
+<li><code><a title="calib3d.calib.Calib.compute_length2D" href="#calib3d.calib.Calib.compute_length2D">compute_length2D</a></code></li>
+<li><code><a title="calib3d.calib.Calib.crop" href="#calib3d.calib.Calib.crop">crop</a></code></li>
+<li><code><a title="calib3d.calib.Calib.dict" href="#calib3d.calib.Calib.dict">dict</a></code></li>
+<li><code><a title="calib3d.calib.Calib.distort" href="#calib3d.calib.Calib.distort">distort</a></code></li>
+<li><code><a title="calib3d.calib.Calib.dump" href="#calib3d.calib.Calib.dump">dump</a></code></li>
+<li><code><a title="calib3d.calib.Calib.flip" href="#calib3d.calib.Calib.flip">flip</a></code></li>
+<li><code><a title="calib3d.calib.Calib.from_P" href="#calib3d.calib.Calib.from_P">from_P</a></code></li>
+<li><code><a title="calib3d.calib.Calib.load" href="#calib3d.calib.Calib.load">load</a></code></li>
+<li><code><a title="calib3d.calib.Calib.project_2D_to_3D" href="#calib3d.calib.Calib.project_2D_to_3D">project_2D_to_3D</a></code></li>
+<li><code><a title="calib3d.calib.Calib.project_3D_to_2D" href="#calib3d.calib.Calib.project_3D_to_2D">project_3D_to_2D</a></code></li>
+<li><code><a title="calib3d.calib.Calib.projects_in" href="#calib3d.calib.Calib.projects_in">projects_in</a></code></li>
+<li><code><a title="calib3d.calib.Calib.rectify" href="#calib3d.calib.Calib.rectify">rectify</a></code></li>
+<li><code><a title="calib3d.calib.Calib.rotate" href="#calib3d.calib.Calib.rotate">rotate</a></code></li>
+<li><code><a title="calib3d.calib.Calib.scale" href="#calib3d.calib.Calib.scale">scale</a></code></li>
+<li><code><a title="calib3d.calib.Calib.update" href="#calib3d.calib.Calib.update">update</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
