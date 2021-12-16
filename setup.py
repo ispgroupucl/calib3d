@@ -1,6 +1,10 @@
 from setuptools import setup, find_packages
 import calib3d
 
+
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 setup(
     version="2.2.6",
     name='calib3d',
@@ -10,6 +14,12 @@ setup(
     licence="LGPL",
     python_requires='>=3.6',
     description="Python 3D calibration and homogenous coordinates computation library",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+    ],
     packages=find_packages(),
     install_requires=[
         "numpy",
