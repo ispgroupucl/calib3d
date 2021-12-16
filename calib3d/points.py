@@ -1,6 +1,23 @@
 from abc import ABCMeta, abstractproperty
 import numpy as np
 
+__doc__ = """
+
+# Working with homogenous coordinates
+
+The vector used to represent 2D and 3D points are vertical vectors, which are stored as 2D matrices in `numpy`.
+Furthemore, in homogenous coordinates: a 3D point (x,y,z) in the world is represented by a 4 element vector
+(𝜆x,𝜆y,𝜆z,𝜆) where 𝜆 ∈ ℝ₀.
+
+To simplify access to x and y (and z) coordinates of those points as well as computations in homogenous coordinates,
+we defined the types [`Point2D`](#Point2D) (and [`Point3D`](#Point3D))
+extending `numpy.ndarray`. Therefore, access to y coordinate of point is `point.y` instead of
+`point[1][0]` (`point[1][:]` for an array of points), and access to homogenous coordinates is made easy with `point.H`,
+while it is still possible to use point with any numpy operators.
+
+"""
+
+
 class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
     """ Extension of Numpy `np.ndarray` that implements generic homogenous coordinates points
         for `Point2D` and `Point3D` objects. The constructor supports multiple formats for creation

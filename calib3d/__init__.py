@@ -1,8 +1,8 @@
 r"""
 This library offers several tools for manipulation of calibrated cameras, projective geometry and computations using homogenous coordinates. The different modules are document here:
 
-- [Computations with homogenous coordinates](./calib3d.points)
-- [Projective geometry with calibrated cameras](./calib3d.calib)
+- [Computations with homogenous coordinates](./calib3d/points)
+- [Projective geometry with calibrated cameras](./calib3d/calib)
 
 # Introduction
 
