@@ -79,7 +79,7 @@ Therefore, by combining
 - the transformation from the world coordinates system to the camera coordinates system (defined by \(R\) and \(T\))
 - with the projection from the camera coordinates system to the image pixels (defined by \(K\)),
 
-We have a projection model allowing to compute the coordinates of a 2D point in the image \(\left(i,j\right)\) from a 3D point in the real world \(\left(x,y,z\right)\) described by the matrix \(P\):
+We have a projection model allowing to compute the coordinates of a 2D point in the image \(\left(i,j\right)\) from a 3D point in the real world $\left(x,y,z\right)$ described by the matrix \(P\):
 $$P := \left[\begin{matrix}K_{3\times 3}&{\bf 0}_{3\times 1}\end{matrix}\right] \left[\begin{matrix}R_{3\times 3}&T_{3\times 1}\\{\bf 0}_{1\times 3}&1\end{matrix}\right]=K_{3\times 3}\left[\begin{matrix}R_{3\times 3}&T_{3\times 1}\end{matrix}\right]$$
 
 The opposite operation requires to invert \(P\) and is done by pseudo-inverse inversion because \(P\) is rectangular.
