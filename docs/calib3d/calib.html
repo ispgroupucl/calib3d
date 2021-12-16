@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>calib3d.calib API documentation</title>
-<meta name="description" content="Calibrated camera …" />
+<meta name="description" content="Theoretical introduction …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -23,13 +23,13 @@
 <h1 class="title">Module <code>calib3d.calib</code></h1>
 </header>
 <section id="section-intro">
-<h1 id="calibrated-camera">Calibrated camera</h1>
+<h1 id="theoretical-introduction">Theoretical introduction</h1>
 <p>Camera calibration is based on the pinhole camera model that approximate how lights travels between the scene and the camera sensor. There are two sets of parameters:</p>
 <ul>
-<li>The <strong>extrinsic parameters</strong> define the position of the camera and it's heading relative to the world coordinates system.</li>
+<li>The <strong>extrinsic parameters</strong> define the camera position and orientation relative to the world coordinates system.</li>
 <li>The <strong>Intrinsic parameters</strong> define the camera sensor and lens parameters.</li>
 </ul>
-<p>They are 3 different coordinates systems:</p>
+<p>There are 3 different coordinates systems:</p>
 <ul>
 <li>The world 3D coordinates system</li>
 <li>The camera 3D coordinates system</li>
@@ -88,7 +88,61 @@ R_{3\times 3} & T_{3\times 1}\\{\bf 0}_{1\times 3}&1
 <p>We have a projection model allowing to compute the coordinates of a 2D point in the image <span><span class="MathJax_Preview">\left(i,j\right)</span><script type="math/tex">\left(i,j\right)</script></span> from a 3D point in the real world <span><span class="MathJax_Preview">\left(x,y,z\right)</span><script type="math/tex">\left(x,y,z\right)</script></span> described by the matrix <span><span class="MathJax_Preview">P</span><script type="math/tex">P</script></span>:
 <span><span class="MathJax_Preview">P := \left[\begin{matrix}K_{3\times 3}&amp;{\bf 0}_{3\times 1}\end{matrix}\right] \left[\begin{matrix}R_{3\times 3}&amp;T_{3\times 1}\\{\bf 0}_{1\times 3}&amp;1\end{matrix}\right]=K_{3\times 3}\left[\begin{matrix}R_{3\times 3}&amp;T_{3\times 1}\end{matrix}\right]</span><script type="math/tex; mode=display">P := \left[\begin{matrix}K_{3\times 3}&{\bf 0}_{3\times 1}\end{matrix}\right] \left[\begin{matrix}R_{3\times 3}&T_{3\times 1}\\{\bf 0}_{1\times 3}&1\end{matrix}\right]=K_{3\times 3}\left[\begin{matrix}R_{3\times 3}&T_{3\times 1}\end{matrix}\right]</script></span></p>
 <p>The opposite operation requires to invert <span><span class="MathJax_Preview">P</span><script type="math/tex">P</script></span> and is done by pseudo-inverse inversion because <span><span class="MathJax_Preview">P</span><script type="math/tex">P</script></span> is rectangular.</p>
-<h2 id="projection-model-implementation">Projection model implementation</h2>
+<h2 id="limitations">Limitations</h2>
+<p>We need a model of the distortions brought by the lens:</p>
+<ul>
+<li><strong>radial</strong> distortion cause lines far from principal point to look distorted.</li>
+<li><strong>tangential</strong> distortion: occur when lens is not prefectly align with the <span><span class="MathJax_Preview">z</span><script type="math/tex">z</script></span> axis of the camera. </li>
+</ul>
+<p>Many lens distortion models exist. Here, we will use the model used in <a href="https://docs.opencv.org/3.1.0/d4/d94/tutorial_camera_calibration.html">opencv</a>.</p>
+<h2 id="distortion-models">Distortion models</h2>
+<p>There are actually 2 different models:</p>
+<ul>
+<li>The direct model that applies distortion: find the 2D image (distorted) coordinates of a 3D point given its 2D projected (undistorted) coordinates.</li>
+<li>The inverse model that rectifies distortion: find the 2D (undistorted) coordinate allowing to project a 2D (distorted) image coordinate into 3D.</li>
+</ul>
+<p><img alt="" src="https://github.com/ispgroupucl/calib3d/blob/main/assets/distortion_steps.png?raw=true"></p>
+<h3 id="direct-model-distort">Direct model: "distort"</h3>
+<p>The following relationships allows to compute the distorted 2D coordinates <span><span class="MathJax_Preview">(x_d,y_d)</span><script type="math/tex">(x_d,y_d)</script></span> on an image from the 2D coordinates provided by the linear projection model <span><span class="MathJax_Preview">(x_u,y_u)</span><script type="math/tex">(x_u,y_u)</script></span>. Those coordinates are expressed in the camera coordinate system, i.e. they are distances (not pixels) and the point <span><span class="MathJax_Preview">(0,0)</span><script type="math/tex">(0,0)</script></span> is the principal point of the camera.</p>
+<p><span><span class="MathJax_Preview">\begin{align}
+x_d &amp;= x_u\overbrace{\left(1 + k_1 {r_u}^2 + k_2 {r_u}^4 + k_3 {r_u}^6+\cdots\right)}^{\text{radial component}} + \overbrace{\left[2p_1 x_uy_u + p_2\left({r_u}^2 + 2{x_u}^2\right)\right]}^{\text{tangeantial component}}\\
+y_d &amp;= y_u\left(1 + k_1 {r_u}^2 + k_2 {r_u}^4 + k_3 {r_u}^6+\cdots\right) + \left[2p_2 x_uy_u + p_1\left({r_u}^2 + 2{y_u}^2\right)\right]
+\end{align}</span><script type="math/tex; mode=display">\begin{align}
+x_d &= x_u\overbrace{\left(1 + k_1 {r_u}^2 + k_2 {r_u}^4 + k_3 {r_u}^6+\cdots\right)}^{\text{radial component}} + \overbrace{\left[2p_1 x_uy_u + p_2\left({r_u}^2 + 2{x_u}^2\right)\right]}^{\text{tangeantial component}}\\
+y_d &= y_u\left(1 + k_1 {r_u}^2 + k_2 {r_u}^4 + k_3 {r_u}^6+\cdots\right) + \left[2p_2 x_uy_u + p_1\left({r_u}^2 + 2{y_u}^2\right)\right]
+\end{align}</script></span></p>
+<p>Where:</p>
+<ul>
+<li><span><span class="MathJax_Preview">k_1, k_2, k_3, \cdots</span><script type="math/tex">k_1, k_2, k_3, \cdots</script></span>
+are the radial distortion coefficients</li>
+<li><span><span class="MathJax_Preview">t_1, t_2</span><script type="math/tex">t_1, t_2</script></span> are the tangential distortion coefficients</li>
+<li><span><span class="MathJax_Preview">{r_u}^2 := {x_u}^2 + {y_u}^2</span><script type="math/tex">{r_u}^2 := {x_u}^2 + {y_u}^2</script></span></li>
+</ul>
+<p>We usually use only 3 radial distortion coefficients, which makes a total of 5 coefficients. Those coefficients are found by running an optimisation algorithm on a set of 2D point - 3D point relations as we did with <code>cv2.calibrateCamera</code>. They are stored in the <code>kc</code> vector.</p>
+<h3 id="inverse-model-rectify">Inverse model: "rectify"</h3>
+<p>The distortion operation cannot be inverted analitically using the coefficients <span><span class="MathJax_Preview">k_1</span><script type="math/tex">k_1</script></span>, <span><span class="MathJax_Preview">k_2</span><script type="math/tex">k_2</script></span>, <span><span class="MathJax_Preview">k_3</span><script type="math/tex">k_3</script></span>, <span><span class="MathJax_Preview">p_1</span><script type="math/tex">p_1</script></span>, <span><span class="MathJax_Preview">p_2</span><script type="math/tex">p_2</script></span> (i.e. have <span><span class="MathJax_Preview">x_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)</span><script type="math/tex">x_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)</script></span> and <span><span class="MathJax_Preview">y_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)</span><script type="math/tex">y_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)</script></span>). We either need another model with another set of coefficients, or make an approximation.</p>
+<p>Here, we will use the following approximation: We will assume that the distortion at point <span><span class="MathJax_Preview">(x_d,y_d)</span><script type="math/tex">(x_d,y_d)</script></span> would be the same that distortion at point <span><span class="MathJax_Preview">(x_u,y_u)</span><script type="math/tex">(x_u,y_u)</script></span> ! Therefore:</p>
+<p><span><span class="MathJax_Preview">\left\{\begin{align}
+2p_1 x_uy_u + p_2\left({r_u}^2 + 2{x_u}^2\right) &amp;\approx 2p_1 x_dy_d + p_2\left({r_d}^2 + 2{x_d}^2\right)\\
+2p_2 x_uy_u + p_1\left({r_u}^2 + 2{y_u}^2\right) &amp;\approx 2p_2 x_dy_d + p_1\left({r_d}^2 + 2{y_d}^2\right) \\
+\left(1 + k_1 {r_u}^2 + k_2 {r_u}^4 + k_3 {r_u}^6+\cdots\right) &amp;\approx \left(1 + k_1 {r_d}^2 + k_2 {r_d}^4 + k_3 {r_d}^6+\cdots\right)
+\end{align}\right.
+</span><script type="math/tex; mode=display">\left\{\begin{align}
+2p_1 x_uy_u + p_2\left({r_u}^2 + 2{x_u}^2\right) &\approx 2p_1 x_dy_d + p_2\left({r_d}^2 + 2{x_d}^2\right)\\
+2p_2 x_uy_u + p_1\left({r_u}^2 + 2{y_u}^2\right) &\approx 2p_2 x_dy_d + p_1\left({r_d}^2 + 2{y_d}^2\right) \\
+\left(1 + k_1 {r_u}^2 + k_2 {r_u}^4 + k_3 {r_u}^6+\cdots\right) &\approx \left(1 + k_1 {r_d}^2 + k_2 {r_d}^4 + k_3 {r_d}^6+\cdots\right)
+\end{align}\right.
+</script></span></p>
+<p>If this approximation holds, it's much easier to get an analytical expression of <span><span class="MathJax_Preview">x_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)</span><script type="math/tex">x_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)</script></span> and <span><span class="MathJax_Preview">y_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)</span><script type="math/tex">y_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)</script></span>.</p>
+<h2 id="full-calibration-model-implementation">Full calibration model implementation</h2>
+<p>We can now build a calibration model of a camera with distortions:
+Let's update our object <code><a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></code> by creating <code>Calib2</code> that handles the distortion:</p>
+<ul>
+<li>We provide the distortion coefficients (as a vector <code>kc</code>) to the constructor of the object</li>
+<li>We override <code>project_3D_to_2D</code> and <code>project_2D_to_30</code> by calling respectively <code>distort</code> (that applys the distortion after
+projecting into 2D) and <code>correct</code> (that removes the distortions before projecting into 3D).</li>
+</ul>
+<h1 id="implementation">Implementation</h1>
 <p>This library defines a <a href="./calib3d.calib#Calib">Calib</a> object to represent a calibrated camera. Its constructor receives in arguments the intrinsic and extrinsic parameters:</p>
 <ul>
 <li>image dimensions <code>width</code> and <code>height</code>,</li>
@@ -108,14 +162,14 @@ from .points import Point2D, Point3D
 
 __doc__ = r&#34;&#34;&#34;
 
-# Calibrated camera
+# Theoretical introduction
 
 Camera calibration is based on the pinhole camera model that approximate how lights travels between the scene and the camera sensor. There are two sets of parameters:
 
-- The **extrinsic parameters** define the position of the camera and it&#39;s heading relative to the world coordinates system.
+- The **extrinsic parameters** define the camera position and orientation relative to the world coordinates system.
 - The **Intrinsic parameters** define the camera sensor and lens parameters.
 
-They are 3 different coordinates systems:
+There are 3 different coordinates systems:
 
 - The world 3D coordinates system
 - The camera 3D coordinates system
@@ -188,7 +242,67 @@ $$P := \left[\begin{matrix}K_{3\times 3}&amp;{\bf 0}_{3\times 1}\end{matrix}\rig
 
 The opposite operation requires to invert \(P\) and is done by pseudo-inverse inversion because \(P\) is rectangular.
 
-## Projection model implementation
+
+## Limitations
+We need a model of the distortions brought by the lens:
+
+- **radial** distortion cause lines far from principal point to look distorted.
+- **tangential** distortion: occur when lens is not prefectly align with the \(z\) axis of the camera. 
+
+Many lens distortion models exist. Here, we will use the model used in [opencv](https://docs.opencv.org/3.1.0/d4/d94/tutorial_camera_calibration.html).
+
+
+## Distortion models
+
+There are actually 2 different models:
+
+- The direct model that applies distortion: find the 2D image (distorted) coordinates of a 3D point given its 2D projected (undistorted) coordinates.
+- The inverse model that rectifies distortion: find the 2D (undistorted) coordinate allowing to project a 2D (distorted) image coordinate into 3D.
+
+.. image:: https://github.com/ispgroupucl/calib3d/blob/main/assets/distortion_steps.png?raw=true
+
+### Direct model: &#34;distort&#34;
+
+The following relationships allows to compute the distorted 2D coordinates \((x_d,y_d)\) on an image from the 2D coordinates provided by the linear projection model \((x_u,y_u)\). Those coordinates are expressed in the camera coordinate system, i.e. they are distances (not pixels) and the point \((0,0)\) is the principal point of the camera.
+
+$$\begin{align}
+    x_d &amp;= x_u\overbrace{\left(1 + k_1 {r_u}^2 + k_2 {r_u}^4 + k_3 {r_u}^6+\cdots\right)}^{\text{radial component}} + \overbrace{\left[2p_1 x_uy_u + p_2\left({r_u}^2 + 2{x_u}^2\right)\right]}^{\text{tangeantial component}}\\
+    y_d &amp;= y_u\left(1 + k_1 {r_u}^2 + k_2 {r_u}^4 + k_3 {r_u}^6+\cdots\right) + \left[2p_2 x_uy_u + p_1\left({r_u}^2 + 2{y_u}^2\right)\right]
+\end{align}$$
+
+Where:
+
+- \(k_1, k_2, k_3, \cdots\)  are the radial distortion coefficients
+- \(t_1, t_2\) are the tangential distortion coefficients
+- \({r_u}^2 := {x_u}^2 + {y_u}^2\)
+
+We usually use only 3 radial distortion coefficients, which makes a total of 5 coefficients. Those coefficients are found by running an optimisation algorithm on a set of 2D point - 3D point relations as we did with `cv2.calibrateCamera`. They are stored in the `kc` vector.
+
+### Inverse model: &#34;rectify&#34;
+
+The distortion operation cannot be inverted analitically using the coefficients \(k_1\), \(k_2\), \(k_3\), \(p_1\), \(p_2\) (i.e. have \(x_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)\) and \(y_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)\)). We either need another model with another set of coefficients, or make an approximation.
+
+Here, we will use the following approximation: We will assume that the distortion at point \((x_d,y_d)\) would be the same that distortion at point \((x_u,y_u)\) ! Therefore:
+
+$$\left\{\begin{align}
+    2p_1 x_uy_u + p_2\left({r_u}^2 + 2{x_u}^2\right) &amp;\approx 2p_1 x_dy_d + p_2\left({r_d}^2 + 2{x_d}^2\right)\\
+    2p_2 x_uy_u + p_1\left({r_u}^2 + 2{y_u}^2\right) &amp;\approx 2p_2 x_dy_d + p_1\left({r_d}^2 + 2{y_d}^2\right) \\
+    \left(1 + k_1 {r_u}^2 + k_2 {r_u}^4 + k_3 {r_u}^6+\cdots\right) &amp;\approx \left(1 + k_1 {r_d}^2 + k_2 {r_d}^4 + k_3 {r_d}^6+\cdots\right)
+   \end{align}\right.
+    $$
+    
+If this approximation holds, it&#39;s much easier to get an analytical expression of \(x_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)\) and \(y_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)\).
+
+## Full calibration model implementation
+We can now build a calibration model of a camera with distortions:
+Let&#39;s update our object `Calib` by creating `Calib2` that handles the distortion:
+
+- We provide the distortion coefficients (as a vector `kc`) to the constructor of the object
+- We override `project_3D_to_2D` and `project_2D_to_30` by calling respectively `distort` (that applys the distortion after 
+projecting into 2D) and `correct` (that removes the distortions before projecting into 3D).
+
+
+# Implementation
 
 This library defines a [Calib](./calib3d.calib#Calib) object to represent a calibrated camera. Its constructor receives in arguments the intrinsic and extrinsic parameters:
 
@@ -1257,13 +1371,20 @@ Returns <code>True</code> where for points that projects in the image and <code>
 <h1>Index</h1>
 <div class="toc">
 <ul>
-<li><a href="#calibrated-camera">Calibrated camera</a><ul>
+<li><a href="#theoretical-introduction">Theoretical introduction</a><ul>
 <li><a href="#extrinsic-parameters">Extrinsic parameters</a></li>
 <li><a href="#intrinsic-parameters">Intrinsic parameters</a></li>
 <li><a href="#projection-model">Projection model</a></li>
-<li><a href="#projection-model-implementation">Projection model implementation</a></li>
+<li><a href="#limitations">Limitations</a></li>
+<li><a href="#distortion-models">Distortion models</a><ul>
+<li><a href="#direct-model-distort">Direct model: "distort"</a></li>
+<li><a href="#inverse-model-rectify">Inverse model: "rectify"</a></li>
 </ul>
 </li>
+<li><a href="#full-calibration-model-implementation">Full calibration model implementation</a></li>
+</ul>
+</li>
+<li><a href="#implementation">Implementation</a></li>
 </ul>
 </div>
 <ul id="index">
