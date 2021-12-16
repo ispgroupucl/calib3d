@@ -7,8 +7,8 @@ of projective geometry computations, building on top of `numpy` and `cv2`.
 
 The different modules are document here:
 
-- [Computations with homogenous coordinates](./calib3d/points)
-- [Projective geometry with calibrated cameras](./calib3d/calib)
+- [Computations with homogenous coordinates](./points.html)
+- [Projective geometry and calibrated cameras](./calib.html)
 
 """
 
