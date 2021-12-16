@@ -136,14 +136,6 @@ $$\left\{\begin{align}
     
 If this approximation holds, it's much easier to get an analytical expression of \(x_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)\) and \(y_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)\).
 
-## Full calibration model implementation
-We can now build a calibration model of a camera with distortions:
-Let's update our object `Calib` by creating `Calib2` that handles the distortion:
-
-- We provide the distortion coefficients (as a vector `kc`) to the constructor of the object
-- We override `project_3D_to_2D` and `project_2D_to_30` by calling respectively `distort` (that applys the distortion after 
-projecting into 2D) and `correct` (that removes the distortions before projecting into 3D).
-
 
 # Implementation
 
