@@ -1,1 +1,0 @@
-calib3d/index.md
