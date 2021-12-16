@@ -80,10 +80,12 @@ R_{3\times 3} & T_{3\times 1}\\{\bf 0}_{1\times 3}&1
 <p><span><span class="MathJax_Preview">\lambda\left[\begin{matrix}i\\j\\1\end{matrix}\right]= \left[\begin{matrix}K_{3\times 3}\end{matrix}\right]\left[\begin{matrix}x_C\\y_C\\z_C\end{matrix}\right]</span><script type="math/tex; mode=display">\lambda\left[\begin{matrix}i\\j\\1\end{matrix}\right]= \left[\begin{matrix}K_{3\times 3}\end{matrix}\right]\left[\begin{matrix}x_C\\y_C\\z_C\end{matrix}\right]</script></span></p>
 <p>The 2D vector in homogenous coordinates is not affected by the value of <span><span class="MathJax_Preview">\lambda</span><script type="math/tex">\lambda</script></span>, while the 3D vector is.</p>
 <h2 id="projection-model">Projection model</h2>
-<p>Therefore, by combining
-- the transformation from the world coordinates system to the camera coordinates system (defined by <span><span class="MathJax_Preview">R</span><script type="math/tex">R</script></span> and <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span>)
-- with the projection from the camera coordinates system to the image pixels (defined by <span><span class="MathJax_Preview">K</span><script type="math/tex">K</script></span>),</p>
-<p>We have a projection model allowing to compute the coordinates of a 2D point in the image <span><span class="MathJax_Preview">\left(i,j\right)</span><script type="math/tex">\left(i,j\right)</script></span> from a 3D point in the real world $\left(x,y,z\right)$ described by the matrix <span><span class="MathJax_Preview">P</span><script type="math/tex">P</script></span>:
+<p>Therefore, by combining</p>
+<ul>
+<li>the transformation from the world coordinates system to the camera coordinates system (defined by <span><span class="MathJax_Preview">R</span><script type="math/tex">R</script></span> and <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span>)</li>
+<li>with the projection from the camera coordinates system to the image pixels (defined by <span><span class="MathJax_Preview">K</span><script type="math/tex">K</script></span>),</li>
+</ul>
+<p>We have a projection model allowing to compute the coordinates of a 2D point in the image <span><span class="MathJax_Preview">\left(i,j\right)</span><script type="math/tex">\left(i,j\right)</script></span> from a 3D point in the real world <span><span class="MathJax_Preview">\left(x,y,z\right)</span><script type="math/tex">\left(x,y,z\right)</script></span> described by the matrix <span><span class="MathJax_Preview">P</span><script type="math/tex">P</script></span>:
 <span><span class="MathJax_Preview">P := \left[\begin{matrix}K_{3\times 3}&amp;{\bf 0}_{3\times 1}\end{matrix}\right] \left[\begin{matrix}R_{3\times 3}&amp;T_{3\times 1}\\{\bf 0}_{1\times 3}&amp;1\end{matrix}\right]=K_{3\times 3}\left[\begin{matrix}R_{3\times 3}&amp;T_{3\times 1}\end{matrix}\right]</span><script type="math/tex; mode=display">P := \left[\begin{matrix}K_{3\times 3}&{\bf 0}_{3\times 1}\end{matrix}\right] \left[\begin{matrix}R_{3\times 3}&T_{3\times 1}\\{\bf 0}_{1\times 3}&1\end{matrix}\right]=K_{3\times 3}\left[\begin{matrix}R_{3\times 3}&T_{3\times 1}\end{matrix}\right]</script></span></p>
 <p>The opposite operation requires to invert <span><span class="MathJax_Preview">P</span><script type="math/tex">P</script></span> and is done by pseudo-inverse inversion because <span><span class="MathJax_Preview">P</span><script type="math/tex">P</script></span> is rectangular.</p>
 <h2 id="projection-model-implementation">Projection model implementation</h2>
@@ -177,10 +179,11 @@ The 2D vector in homogenous coordinates is not affected by the value of \(\lambd
 ## Projection model
 
 Therefore, by combining
+
 - the transformation from the world coordinates system to the camera coordinates system (defined by \(R\) and \(T\))
 - with the projection from the camera coordinates system to the image pixels (defined by \(K\)),
 
-We have a projection model allowing to compute the coordinates of a 2D point in the image \(\left(i,j\right)\) from a 3D point in the real world $\left(x,y,z\right)$ described by the matrix \(P\):
+We have a projection model allowing to compute the coordinates of a 2D point in the image \(\left(i,j\right)\) from a 3D point in the real world \(\left(x,y,z\right)\) described by the matrix \(P\):
 $$P := \left[\begin{matrix}K_{3\times 3}&amp;{\bf 0}_{3\times 1}\end{matrix}\right] \left[\begin{matrix}R_{3\times 3}&amp;T_{3\times 1}\\{\bf 0}_{1\times 3}&amp;1\end{matrix}\right]=K_{3\times 3}\left[\begin{matrix}R_{3\times 3}&amp;T_{3\times 1}\end{matrix}\right]$$
 
 The opposite operation requires to invert \(P\) and is done by pseudo-inverse inversion because \(P\) is rectangular.
@@ -233,10 +236,11 @@ class Calib():
     @classmethod
     def from_P(cls, P, width, height) -&gt; &#39;Calib&#39;:
         &#34;&#34;&#34; Create a `Calib` object from a given projection matrix `P` and image dimensions `width` and `height`.
+
             Args:
-                P (np.ndarray) : a 3x4 projection matrix
-                width (int) : image width
-                height (int) : image height
+                P (np.ndarray): a 3x4 projection matrix
+                width (int): image width
+                height (int): image height
             Returns:
                 A Calib object
         &#34;&#34;&#34;
@@ -247,7 +251,7 @@ class Calib():
     def load(cls, filename) -&gt; &#39;Calib&#39;:
         &#34;&#34;&#34; Loads a Calib object from a file (using the pickle library)
             Args:
-                filename (str) : the file that stores the Calib object
+                filename (str): the file that stores the Calib object
             Returns:
                 The `Calib` object previously saved in `filename`.
         &#34;&#34;&#34;
@@ -263,7 +267,7 @@ class Calib():
     def dump(self, filename) -&gt; None:
         &#34;&#34;&#34; Saves the current calib object to a file (using the pickle library)
             Args:
-                filename (str) : the file that will store the calib object
+                filename (str): the file that will store the calib object
         &#34;&#34;&#34;
         with open(filename, &#34;wb&#34;) as f:
             pickle.dump(self.dict, f)
@@ -275,7 +279,7 @@ class Calib():
     def project_3D_to_2D(self, point3D: Point3D) -&gt; Point2D:
         &#34;&#34;&#34; Using the calib object, project a 3D point in the 2D image space.
             Args:
-                point3D (Point3D) : the 3D point to be projected
+                point3D (Point3D): the 3D point to be projected
             Returns:
                 The point in the 2D image space on which point3D is projected by calib
         &#34;&#34;&#34;
@@ -291,8 +295,8 @@ class Calib():
     def project_2D_to_3D(self, point2D: Point2D, Z: float) -&gt; Point3D:
         &#34;&#34;&#34; Using the calib object, project a 2D point in the 3D image space.
             Args:
-                point2D (Point2D) : the 2D point to be projected
-                Z (float) : the Z coordinate of the 3D point
+                point2D (Point2D): the 2D point to be projected
+                Z (float): the Z coordinate of the 3D point
             Returns:
                 The point in the 3D world for which the z=`Z` and that projects on `point2D`.
         &#34;&#34;&#34;
@@ -384,11 +388,11 @@ class Calib():
 
 def find_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
     &#34;&#34;&#34; Finds the intersection between a line and a plane.
-        Arguments:
-            C - a Point3D of a point on the line
-            d - the direction-vector of the line
-            P - a Point3D on the plane
-            n - the normal vector of the plane
+        Args:
+            C (Point3D): a point on the line
+            d (np.ndarray): the direction-vector of the line
+            P (Point3D): a Point3D on the plane
+            n (np.ndarray): the normal vector of the plane
         Returns the Point3D at the intersection between the line and the plane.
     &#34;&#34;&#34;
     d = d/np.linalg.norm(d, axis=0)
@@ -581,23 +585,29 @@ Credits: François Ledent</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Finds the intersection between a line and a plane.</p>
-<h2 id="arguments">Arguments</h2>
-<p>C - a Point3D of a point on the line
-d - the direction-vector of the line
-P - a Point3D on the plane
-n - the normal vector of the plane
-Returns the Point3D at the intersection between the line and the plane.</p></div>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>C</code></strong> :&ensp;<code>Point3D</code></dt>
+<dd>a point on the line</dd>
+<dt><strong><code>d</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>the direction-vector of the line</dd>
+<dt><strong><code>P</code></strong> :&ensp;<code>Point3D</code></dt>
+<dd>a Point3D on the plane</dd>
+<dt><strong><code>n</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>the normal vector of the plane</dd>
+</dl>
+<p>Returns the Point3D at the intersection between the line and the plane.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def find_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
     &#34;&#34;&#34; Finds the intersection between a line and a plane.
-        Arguments:
-            C - a Point3D of a point on the line
-            d - the direction-vector of the line
-            P - a Point3D on the plane
-            n - the normal vector of the plane
+        Args:
+            C (Point3D): a point on the line
+            d (np.ndarray): the direction-vector of the line
+            P (Point3D): a Point3D on the plane
+            n (np.ndarray): the normal vector of the plane
         Returns the Point3D at the intersection between the line and the plane.
     &#34;&#34;&#34;
     d = d/np.linalg.norm(d, axis=0)
@@ -730,10 +740,11 @@ The returned image will be large enough to hold the entire new image, with a bla
     @classmethod
     def from_P(cls, P, width, height) -&gt; &#39;Calib&#39;:
         &#34;&#34;&#34; Create a `Calib` object from a given projection matrix `P` and image dimensions `width` and `height`.
+
             Args:
-                P (np.ndarray) : a 3x4 projection matrix
-                width (int) : image width
-                height (int) : image height
+                P (np.ndarray): a 3x4 projection matrix
+                width (int): image width
+                height (int): image height
             Returns:
                 A Calib object
         &#34;&#34;&#34;
@@ -744,7 +755,7 @@ The returned image will be large enough to hold the entire new image, with a bla
     def load(cls, filename) -&gt; &#39;Calib&#39;:
         &#34;&#34;&#34; Loads a Calib object from a file (using the pickle library)
             Args:
-                filename (str) : the file that stores the Calib object
+                filename (str): the file that stores the Calib object
             Returns:
                 The `Calib` object previously saved in `filename`.
         &#34;&#34;&#34;
@@ -760,7 +771,7 @@ The returned image will be large enough to hold the entire new image, with a bla
     def dump(self, filename) -&gt; None:
         &#34;&#34;&#34; Saves the current calib object to a file (using the pickle library)
             Args:
-                filename (str) : the file that will store the calib object
+                filename (str): the file that will store the calib object
         &#34;&#34;&#34;
         with open(filename, &#34;wb&#34;) as f:
             pickle.dump(self.dict, f)
@@ -772,7 +783,7 @@ The returned image will be large enough to hold the entire new image, with a bla
     def project_3D_to_2D(self, point3D: Point3D) -&gt; Point2D:
         &#34;&#34;&#34; Using the calib object, project a 3D point in the 2D image space.
             Args:
-                point3D (Point3D) : the 3D point to be projected
+                point3D (Point3D): the 3D point to be projected
             Returns:
                 The point in the 2D image space on which point3D is projected by calib
         &#34;&#34;&#34;
@@ -788,8 +799,8 @@ The returned image will be large enough to hold the entire new image, with a bla
     def project_2D_to_3D(self, point2D: Point2D, Z: float) -&gt; Point3D:
         &#34;&#34;&#34; Using the calib object, project a 2D point in the 3D image space.
             Args:
-                point2D (Point2D) : the 2D point to be projected
-                Z (float) : the Z coordinate of the 3D point
+                point2D (Point2D): the 2D point to be projected
+                Z (float): the Z coordinate of the 3D point
             Returns:
                 The point in the 3D world for which the z=`Z` and that projects on `point2D`.
         &#34;&#34;&#34;
@@ -887,9 +898,14 @@ The returned image will be large enough to hold the entire new image, with a bla
 <dd>
 <div class="desc"><p>Create a <code><a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></code> object from a given projection matrix <code>P</code> and image dimensions <code>width</code> and <code>height</code>.</p>
 <h2 id="args">Args</h2>
-<p>P (np.ndarray) : a 3x4 projection matrix
-width (int) : image width
-height (int) : image height</p>
+<dl>
+<dt><strong><code>P</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>a 3x4 projection matrix</dd>
+<dt><strong><code>width</code></strong> :&ensp;<code>int</code></dt>
+<dd>image width</dd>
+<dt><strong><code>height</code></strong> :&ensp;<code>int</code></dt>
+<dd>image height</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <p>A Calib object</p></div>
 <details class="source">
@@ -899,10 +915,11 @@ height (int) : image height</p>
 <pre><code class="python">@classmethod
 def from_P(cls, P, width, height) -&gt; &#39;Calib&#39;:
     &#34;&#34;&#34; Create a `Calib` object from a given projection matrix `P` and image dimensions `width` and `height`.
+
         Args:
-            P (np.ndarray) : a 3x4 projection matrix
-            width (int) : image width
-            height (int) : image height
+            P (np.ndarray): a 3x4 projection matrix
+            width (int): image width
+            height (int): image height
         Returns:
             A Calib object
     &#34;&#34;&#34;
@@ -916,7 +933,10 @@ def from_P(cls, P, width, height) -&gt; &#39;Calib&#39;:
 <dd>
 <div class="desc"><p>Loads a Calib object from a file (using the pickle library)</p>
 <h2 id="args">Args</h2>
-<p>filename (str) : the file that stores the Calib object</p>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code></dt>
+<dd>the file that stores the Calib object</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <p>The <code><a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></code> object previously saved in <code>filename</code>.</p></div>
 <details class="source">
@@ -927,7 +947,7 @@ def from_P(cls, P, width, height) -&gt; &#39;Calib&#39;:
 def load(cls, filename) -&gt; &#39;Calib&#39;:
     &#34;&#34;&#34; Loads a Calib object from a file (using the pickle library)
         Args:
-            filename (str) : the file that stores the Calib object
+            filename (str): the file that stores the Calib object
         Returns:
             The `Calib` object previously saved in `filename`.
     &#34;&#34;&#34;
@@ -1029,7 +1049,10 @@ def dict(self) -&gt; dict:
 <dd>
 <div class="desc"><p>Saves the current calib object to a file (using the pickle library)</p>
 <h2 id="args">Args</h2>
-<p>filename (str) : the file that will store the calib object</p></div>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code></dt>
+<dd>the file that will store the calib object</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1037,7 +1060,7 @@ def dict(self) -&gt; dict:
 <pre><code class="python">def dump(self, filename) -&gt; None:
     &#34;&#34;&#34; Saves the current calib object to a file (using the pickle library)
         Args:
-            filename (str) : the file that will store the calib object
+            filename (str): the file that will store the calib object
     &#34;&#34;&#34;
     with open(filename, &#34;wb&#34;) as f:
         pickle.dump(self.dict, f)</code></pre>
@@ -1063,8 +1086,12 @@ def dict(self) -&gt; dict:
 <dd>
 <div class="desc"><p>Using the calib object, project a 2D point in the 3D image space.</p>
 <h2 id="args">Args</h2>
-<p>point2D (Point2D) : the 2D point to be projected
-Z (float) : the Z coordinate of the 3D point</p>
+<dl>
+<dt><strong><code>point2D</code></strong> :&ensp;<code>Point2D</code></dt>
+<dd>the 2D point to be projected</dd>
+<dt><strong><code>Z</code></strong> :&ensp;<code>float</code></dt>
+<dd>the Z coordinate of the 3D point</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <p>The point in the 3D world for which the z=<code>Z</code> and that projects on <code>point2D</code>.</p></div>
 <details class="source">
@@ -1074,8 +1101,8 @@ Z (float) : the Z coordinate of the 3D point</p>
 <pre><code class="python">def project_2D_to_3D(self, point2D: Point2D, Z: float) -&gt; Point3D:
     &#34;&#34;&#34; Using the calib object, project a 2D point in the 3D image space.
         Args:
-            point2D (Point2D) : the 2D point to be projected
-            Z (float) : the Z coordinate of the 3D point
+            point2D (Point2D): the 2D point to be projected
+            Z (float): the Z coordinate of the 3D point
         Returns:
             The point in the 3D world for which the z=`Z` and that projects on `point2D`.
     &#34;&#34;&#34;
@@ -1092,7 +1119,10 @@ Z (float) : the Z coordinate of the 3D point</p>
 <dd>
 <div class="desc"><p>Using the calib object, project a 3D point in the 2D image space.</p>
 <h2 id="args">Args</h2>
-<p>point3D (Point3D) : the 3D point to be projected</p>
+<dl>
+<dt><strong><code>point3D</code></strong> :&ensp;<code>Point3D</code></dt>
+<dd>the 3D point to be projected</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <p>The point in the 2D image space on which point3D is projected by calib</p></div>
 <details class="source">
@@ -1102,7 +1132,7 @@ Z (float) : the Z coordinate of the 3D point</p>
 <pre><code class="python">def project_3D_to_2D(self, point3D: Point3D) -&gt; Point2D:
     &#34;&#34;&#34; Using the calib object, project a 3D point in the 2D image space.
         Args:
-            point3D (Point3D) : the 3D point to be projected
+            point3D (Point3D): the 3D point to be projected
         Returns:
             The point in the 2D image space on which point3D is projected by calib
     &#34;&#34;&#34;
