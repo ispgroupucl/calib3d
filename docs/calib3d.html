@@ -47,6 +47,7 @@
 
                     <h2>Contents</h2>
                     <ul>
+  <li><a href="#introduction">Introduction</a></li>
   <li><a href="#working-with-homogenous-coordinates">Working with homogenous coordinates</a></li>
   <li><a href="#camera-calibration">Camera calibration</a>
   <ul>
@@ -79,17 +80,24 @@
                     <h1 class="modulename">
 calib3d    </h1>
 
-                        <div class="docstring"><p>Camera calibration allows to determine the relation between the camera's pixels (2D coordinates) and points in the real world
+                        <div class="docstring"><p>This library offers several tools for manipulation of calibrated cameras, projective geometry and computations using homogenous coordinates. The different modules are document here:</p>
+
+<ul>
+<li><a href="./calib3d.points">Computations with homogenous coordinates</a></li>
+<li><a href="./calib3d.calib">Projective geometry with calibrated cameras</a></li>
+</ul>
+
+<h1 id="introduction">Introduction</h1>
+
+<p>Camera calibration allows to determine the relation between the camera's pixels (2D coordinates) and points in the real world
 (3D coordinates). It implies computation using homogenous coordinates. This python library aims at simplifying implementations
-of projective geometry computations.</p>
+of projective geometry computations, building on top of <code>numpy</code> and <code>cv2</code>.</p>
 
 <h1 id="working-with-homogenous-coordinates">Working with homogenous coordinates</h1>
 
 <p>The vector used to represent 2D and 3D points are vertical vectors, which are stored as 2D matrices in <code>numpy</code>. Furthemore, in homogenous coordinates: a 3D point (x,y,z) in the world is represented by a 4 element vector (𝜆x,𝜆y,𝜆z,𝜆) where 𝜆 ∈ ℝ₀.</p>
 
 <p>To simplify access to x and y (and z) coordinates of those points as well as computations in homogenous coordinates, we defined the types <a href="./calib3d.points#Point2D"><code>Point2D</code></a> (and <a href="./calib3d.points#Point3D"><code>Point3D</code></a>) extending <code>numpy.ndarray</code>. Therefore, access to y coordinate of point is <code>point.y</code> instead of <code>point[1][0]</code> (<code>point[1][:]</code> for an array of points), and access to homogenous coordinates is made easy with <code>point.H</code>, while it is still possible to use point with any numpy operators.</p>
-
-<p>Full documentation <a href="./calib3d.points">points</a></p>
 
 <h1 id="camera-calibration">Camera calibration</h1>
 
@@ -100,10 +108,11 @@ The Intrinsic parameters define sensor and lens parameters. In the simple projec
 
 <p>They are 3 different coordinates systems:</p>
 
-<pre><code>The 3D coordinates relative to the origin of the world.
-The 3D coordinates relative to the camera center.
-The 2D pixel positions where 3D positions are being projected.
-</code></pre>
+<ul>
+<li>The 3D coordinates relative to the origin of the world.</li>
+<li>The 3D coordinates relative to the camera center.</li>
+<li>The 2D pixel positions where 3D positions are being projected.</li>
+</ul>
 
 <h2 id="extrinsic-parameters">Extrinsic parameters</h2>
 

@@ -46,6 +46,8 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
         else:
             raise ValueError(invalid_shape_message)
         return array.astype(np.float64).view(cls)
+    # def __array_ufunc__():
+    #    TODO
     # def __array_wrap__(self, out_arr, context=None):
     #     return super().__array_wrap__(self, out_arr, context)
     @property
