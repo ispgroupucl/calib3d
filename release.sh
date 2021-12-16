@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # build documentation
-pdoc calib3d -d google --math --no-show-source -o docs/
+pdoc calib3d -o docs/ -c latex_math=True --force --html
 
 # Extract version number from setup.py
 RELEASE_NUM=`grep version setup.py | cut -d\" -f2 | cut -d\' -f2`

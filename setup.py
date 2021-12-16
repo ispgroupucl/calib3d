@@ -6,12 +6,12 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    version="2.2.6",
+    version="2.3.0",
     name='calib3d',
     author='Gabriel Van Zandycke',
     author_email="gabriel.vanzandycke@hotmail.com",
     url="https://github.com/ispgroupucl/calib3d",
-    licence="LGPL",
+    license="LGPL",
     python_requires='>=3.6',
     description="Python 3D calibration and homogenous coordinates computation library",
     long_description=long_description,
