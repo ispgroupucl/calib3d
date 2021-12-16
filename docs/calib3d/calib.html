@@ -43,6 +43,17 @@
                         <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
                                pattern=".+" required>
 
+                    <h2>Contents</h2>
+                    <ul>
+  <li><a href="#camera-calibration">Camera calibration</a>
+  <ul>
+    <li><a href="#extrinsic-parameters">Extrinsic parameters</a></li>
+    <li><a href="#intrinsic-parameters">Intrinsic parameters</a></li>
+    <li><a href="#projection-model">Projection model</a></li>
+    <li><a href="#projection-model-implementation">Projection model implementation</a></li>
+  </ul></li>
+</ul>
+
 
 
                     <h2>API Documentation</h2>
@@ -132,7 +143,111 @@
                     <h1 class="modulename">
 <a href="./../calib3d.html">calib3d</a><wbr>.calib    </h1>
 
-                
+                        <div class="docstring"><h1 id="camera-calibration">Camera calibration</h1>
+
+<p>It is based on the pinhole camera model that approximate how lights travels between the scene and the camera sensor. Camera calibration is composed of two sets of parameters:</p>
+
+<p>The extrinsic parameters define the position of the camera center and it's heading relative to the world coordinates.
+The Intrinsic parameters define sensor and lens parameters. In the simple projective model, no distortion is taken into account.</p>
+
+<p>They are 3 different coordinates systems:</p>
+
+<ul>
+<li>The 3D coordinates relative to the origin of the world.</li>
+<li>The 3D coordinates relative to the camera center.</li>
+<li>The 2D pixel positions where 3D positions are being projected.</li>
+</ul>
+
+<h2 id="extrinsic-parameters">Extrinsic parameters</h2>
+
+<p>The extrinsic parameters defines the transformations from the 3D coordinates relative the origin of the world $\left[x_O,y_O,z_O\right]^T$ to the 3D coordinates relative to the camera center $\left[x_C,y_C,z_C\right]^T$. The camera 3D coordinates system has the following <strong>conventions</strong>:</p>
+
+<ul>
+<li>The point (0,0,0) is the center of projection of the camera and is called the _principal point_.</li>
+<li>The $z$ axis of the camera points _towards the scene_, the $x$ axis is along the sensor width pointing towards the right of the image, and the $y$ axis is along the sensor height pointing towards the bottom of the image.</li>
+</ul>
+
+<p>The _camera_ coordinates system is therefore a transformation of the _world_ coordinates systems with:</p>
+
+<ul>
+<li>A <strong>rotation</strong> defined by a rotation matrix $R$ using euler angles in a right-hand orthogonal system. The rotation is applied to the world coordinates system to obtain the camera orientation.</li>
+<li>A <strong>translation</strong> defined by a translation vector $T$ representing the position of the center of the world in the camera coordinates system !</li>
+</ul>
+
+<p>Hence,</p>
+
+<p>$$\lambda\left[\begin{matrix}x_C\y_C\z_C\1\end{matrix}\right] = \left[\begin{matrix}
+R_{3x3} &amp; T_{3x1}\{\bf 0}_{1x3}&amp;1
+\end{matrix}\right] \left[\begin{matrix}x_O\y_O\z_O\1\end{matrix}\right]$$</p>
+
+<p><strong>Important notes:</strong></p>
+
+<ul>
+<li>The rotation matrix represents a passive (or alias) transformation because it's the coordinates system that rotates and not the objects.</li>
+<li>Euler angles define a 3D rotation starting with a rotation around $x$ followed by a rotation around $y$ followed by a rotation around $z$ (the order matters).</li>
+<li>If $T$ is expressed in the camera coordinate system, the position of the camera expressed in world coordinates system is $C:=-R^{-1}T = -R^{T}T$ (since $R$ is a rotation matrix).</li>
+</ul>
+
+<h2 id="intrinsic-parameters">Intrinsic parameters</h2>
+
+<p>The intrinsic parameters defines the transformation between the 3D coordinates relative to the camera center $\left[x_C,y_C,z_C\right]^T$ and the 2D coordinates in the camera sensor $\left[i,j\right]^T$. This transformation is called a _projection_ and includes:</p>
+
+<ul>
+<li>the scale produced by the focal length, with $f$ being the distance between the camera center and the plane on which the image is projected.</li>
+<li>the scale factors $(m_x,m_y)$ relating pixels units to distance units (usually $m_x=m_y$ because pixels are squares).</li>
+<li>the translation from the camera _principal point_ to a top-left origin, with $(u_0,v_0)$ being the position of the _principal point_ expressed in the image coordinates system.</li>
+<li>a skew coefficient $\gamma$ between the $x$ and $y$ axis in the sensor (usually $\gamma=0$ because pixels are squares).</li>
+</ul>
+
+<p>Those transformations can be aggregated in the following matrix called "camera matrix":</p>
+
+<p>$$K := \left[\begin{matrix}f\cdot m_x &amp; \gamma &amp; u_0 \ 0 &amp; f\cdot m_y &amp; v_0 \ 0 &amp; 0 &amp; 1\end{matrix}\right]$$</p>
+
+<p>Therefore,
+$$\lambda\left[\begin{matrix}i\ j\ 1\end{matrix}\right]= \left[\begin{matrix}K_{3x3}&amp;{\bf 0}_{3x1}\end{matrix}\right]\left[\begin{matrix}x_C\y_C\z_C\1\end{matrix}\right]$$</p>
+
+<p><strong>Notes:</strong></p>
+
+<ul>
+<li>The width and height of the image are to be added to those parameters and delimits the sensor width and height in pixels.</li>
+<li>When applying the <strong>direct</strong> projection of a given 3D point, different values of $\lambda$ will always give the <strong>same</strong> 2D point.</li>
+<li>When applying the <strong>inverse</strong> projection on a given 2D point, different values of $\lambda$ will give <strong>different</strong> 3D points.</li>
+</ul>
+
+<p>This is obvious when simplifying the relation between the two points (The column ${\bf 0}_{3x1}$ cancels the homogenous component of the 3D point):</p>
+
+<p>$$\lambda\left[\begin{matrix}i\j\1\end{matrix}\right]= \left[\begin{matrix}K_{3x3}\end{matrix}\right]\left[\begin{matrix}x_C\y_C\z_C\end{matrix}\right]$$</p>
+
+<p>The 2D vector in homogenous coordinates is not affected by the value of $\lambda$, while the 3D vector is.</p>
+
+<h2 id="projection-model">Projection model</h2>
+
+<p>Therefore, by combining</p>
+
+<ul>
+<li>the transformation from the world coordinates system to the camera coordinates system (defined by $R$ and $T$)</li>
+<li>with the projection from the camera coordinates system to the image pixels (defined by $K$),</li>
+</ul>
+
+<p>We have a projection model allowing to compute the coordinates of a 2D point in the image $\left(i,j\right)$ from a 3D point in the real world $\left(x,y,z\right)$ described by the matrix $P$:
+$$P := \left[\begin{matrix}K_{3x3}&amp;{\bf 0}_{3x1}\end{matrix}\right] \left[\begin{matrix}R_{3x3}&amp;T_{3x1}\{\bf 0}_{1x3}&amp;1\end{matrix}\right]=K_{3x3}\left[\begin{matrix}R_{3x3}&amp;T_{3x1}\end{matrix}\right]$$</p>
+
+<p>The opposite operation requires to invert $P$ and is done by pseudo-inverse inversion because $P$ is rectangular.</p>
+
+<h2 id="projection-model-implementation">Projection model implementation</h2>
+
+<p>This library defines a <a href="./calib3d.calib#Calib">Calib</a> object to represent a calibrated camera. Its constructor receives in arguments the intrinsic and extrinsic parameters:</p>
+
+<ul>
+<li>image dimensions <code>width</code> and <code>height</code>,</li>
+<li>the translation vector <code>T</code>,</li>
+<li>the rotation matrix <code>R</code>,</li>
+<li>the camera matrix <code>K</code>.</li>
+</ul>
+
+<p>The method <code>project_3D_to_2D</code> allows to compute the position in the image of a 3D point in the world. The opposite operation <code>project_2D_to_3D</code> requires an additional parameter <code>Z</code> that tells the $z$ coordinate of the 3D point.</p>
+</div>
+
                 
             </section>
                 <section id="Calib">

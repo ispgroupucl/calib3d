@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractproperty
 import numpy as np
 
-__doc__ = """
+__doc__ = r"""
 
 # Working with homogenous coordinates
 
