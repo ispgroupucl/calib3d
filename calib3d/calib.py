@@ -150,6 +150,7 @@ The method `project_3D_to_2D` allows to compute the position in the image of a 3
 
 """
 
+EPS = 1e-5
 
 class Calib():
     def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, kc=None, **_) -> None:
@@ -253,7 +254,7 @@ class Calib():
         point2D = self.rectify(point2D)
         X = Point3D(self.Pinv @ point2D.H)
         d = (X - self.C)
-        return find_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)
+        return line_plane_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)
 
     def distort(self, point2D: Point2D) -> Point2D:
         """ Applies lens distortions to the given `point2D`.
@@ -335,7 +336,7 @@ class Calib():
         cond = np.stack((point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width, point2D.y <= self.height))
         return np.all(cond, axis=0)
 
-def find_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
+def line_plane_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
     """ Finds the intersection between a line and a plane.
         Args:
             C (Point3D): a point on the line
@@ -344,8 +345,11 @@ def find_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
             n (np.ndarray): the normal vector of the plane
         Returns the Point3D at the intersection between the line and the plane.
     """
+    dot = d.T @ n
+    if np.abs(dot) < EPS:
+        return None
     d = d/np.linalg.norm(d, axis=0)
-    dist = ((P-C).T @ n) / (d.T @ n)  # Distance between plane z=Z and camera
+    dist = ((P-C).T @ n) / dot  # Distance between plane z=Z and camera
     return Point3D(C + dist.T*d)
 
 def compute_rotate(width, height, angle):

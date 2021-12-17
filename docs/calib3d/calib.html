@@ -299,6 +299,7 @@ The method `project_3D_to_2D` allows to compute the position in the image of a 3
 
 &#34;&#34;&#34;
 
+EPS = 1e-5
 
 class Calib():
     def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, kc=None, **_) -&gt; None:
@@ -402,7 +403,7 @@ class Calib():
         point2D = self.rectify(point2D)
         X = Point3D(self.Pinv @ point2D.H)
         d = (X - self.C)
-        return find_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)
+        return line_plane_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)
 
     def distort(self, point2D: Point2D) -&gt; Point2D:
         &#34;&#34;&#34; Applies lens distortions to the given `point2D`.
@@ -484,7 +485,7 @@ class Calib():
         cond = np.stack((point2D.x &gt;= 0, point2D.y &gt;= 0, point2D.x &lt;= self.width, point2D.y &lt;= self.height))
         return np.all(cond, axis=0)
 
-def find_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
+def line_plane_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
     &#34;&#34;&#34; Finds the intersection between a line and a plane.
         Args:
             C (Point3D): a point on the line
@@ -493,8 +494,11 @@ def find_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
             n (np.ndarray): the normal vector of the plane
         Returns the Point3D at the intersection between the line and the plane.
     &#34;&#34;&#34;
+    dot = d.T @ n
+    if np.abs(dot) &lt; EPS:
+        return None
     d = d/np.linalg.norm(d, axis=0)
-    dist = ((P-C).T @ n) / (d.T @ n)  # Distance between plane z=Z and camera
+    dist = ((P-C).T @ n) / dot  # Distance between plane z=Z and camera
     return Point3D(C + dist.T*d)
 
 def compute_rotate(width, height, angle):
@@ -678,8 +682,8 @@ Credits: François Ledent</p></div>
     return R</code></pre>
 </details>
 </dd>
-<dt id="calib3d.calib.find_intersection"><code class="name flex">
-<span>def <span class="ident">find_intersection</span></span>(<span>C: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>, d, P: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>, n) ‑> <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a></span>
+<dt id="calib3d.calib.line_plane_intersection"><code class="name flex">
+<span>def <span class="ident">line_plane_intersection</span></span>(<span>C: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>, d, P: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>, n) ‑> <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Finds the intersection between a line and a plane.</p>
@@ -699,7 +703,7 @@ Credits: François Ledent</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def find_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
+<pre><code class="python">def line_plane_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
     &#34;&#34;&#34; Finds the intersection between a line and a plane.
         Args:
             C (Point3D): a point on the line
@@ -708,8 +712,11 @@ Credits: François Ledent</p></div>
             n (np.ndarray): the normal vector of the plane
         Returns the Point3D at the intersection between the line and the plane.
     &#34;&#34;&#34;
+    dot = d.T @ n
+    if np.abs(dot) &lt; EPS:
+        return None
     d = d/np.linalg.norm(d, axis=0)
-    dist = ((P-C).T @ n) / (d.T @ n)  # Distance between plane z=Z and camera
+    dist = ((P-C).T @ n) / dot  # Distance between plane z=Z and camera
     return Point3D(C + dist.T*d)</code></pre>
 </details>
 </dd>
@@ -906,7 +913,7 @@ The returned image will be large enough to hold the entire new image, with a bla
         point2D = self.rectify(point2D)
         X = Point3D(self.Pinv @ point2D.H)
         d = (X - self.C)
-        return find_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)
+        return line_plane_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)
 
     def distort(self, point2D: Point2D) -&gt; Point2D:
         &#34;&#34;&#34; Applies lens distortions to the given `point2D`.
@@ -1208,7 +1215,7 @@ def dict(self) -&gt; dict:
     point2D = self.rectify(point2D)
     X = Point3D(self.Pinv @ point2D.H)
     d = (X - self.C)
-    return find_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)</code></pre>
+    return line_plane_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)</code></pre>
 </details>
 </dd>
 <dt id="calib3d.calib.Calib.project_3D_to_2D"><code class="name flex">
@@ -1380,7 +1387,7 @@ Returns <code>True</code> where for points that projects in the image and <code>
 <ul class="">
 <li><code><a title="calib3d.calib.compute_rotate" href="#calib3d.calib.compute_rotate">compute_rotate</a></code></li>
 <li><code><a title="calib3d.calib.compute_rotation_matrix" href="#calib3d.calib.compute_rotation_matrix">compute_rotation_matrix</a></code></li>
-<li><code><a title="calib3d.calib.find_intersection" href="#calib3d.calib.find_intersection">find_intersection</a></code></li>
+<li><code><a title="calib3d.calib.line_plane_intersection" href="#calib3d.calib.line_plane_intersection">line_plane_intersection</a></code></li>
 <li><code><a title="calib3d.calib.parameters_to_affine_transform" href="#calib3d.calib.parameters_to_affine_transform">parameters_to_affine_transform</a></code></li>
 <li><code><a title="calib3d.calib.rotate_image" href="#calib3d.calib.rotate_image">rotate_image</a></code></li>
 </ul>
