@@ -345,10 +345,10 @@ def line_plane_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
             n (np.ndarray): the normal vector of the plane
         Returns the Point3D at the intersection between the line and the plane.
     """
-    dot = d.T @ n
-    if np.abs(dot) < EPS:
-        return None
     d = d/np.linalg.norm(d, axis=0)
+    dot = d.T @ n
+    if np.any(np.abs(dot) < EPS):
+        return None
     dist = ((P-C).T @ n) / dot  # Distance between plane z=Z and camera
     return Point3D(C + dist.T*d)
 
