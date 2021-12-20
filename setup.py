@@ -1,12 +1,11 @@
 from setuptools import setup, find_packages
-import calib3d
 
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    version="2.3.2",
+    version="2.3.3",
     name='calib3d',
     author='Gabriel Van Zandycke',
     author_email="gabriel.vanzandycke@hotmail.com",
