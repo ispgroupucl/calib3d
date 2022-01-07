@@ -47,8 +47,8 @@ The `Calib` class that represent a calibrated camera. It has a serie of methods 
 >>> w, h = np.array([4000, 3000])                  # sensor size       [px²]  12 Mpx sensor
 >>> d = w/sensor_size                              # pixel density     [m⁻¹]
 >>> K = np.array([[ d*f,  0 , w/2 ],               # Camera matrix (intrinsic parameters)
-                  [  0 , d*f, h/2 ],
-                  [  0 ,  0 ,  1  ]])
+...               [  0 , d*f, h/2 ],
+...               [  0 ,  0 ,  1  ]])
 >>> C = Point3D(10,10,10)                          # Camera position in the 3D space
 >>> R = compute_rotation_matrix(Point3D(0,0,0), C) # Camera pointing towards origin
 >>> calib = Calib(K=K, T=-R@C, R=R, width=w, height=h)
@@ -57,11 +57,19 @@ Point2D([[2000.],
          [1500.]])
 ```
 
-#### Camera transformations
 Cropping or scaling a calib is made easy with the following operations (for more operations, check the documentation)
 ```
 >>> new_calib = calib.crop(x_slice=slice(10, 110, None), y_slice=slice(500, 600, None))
 >>> new_calib = calib.scale(output_width=2000, output_height=1500)
+```
+
+Other useful methods
+```
+>>> calib.projects_in(Point3D(0, 20, 20))
+False
+
+>>> calib.compute_length2D(.42, Point3D(0, 0, 0))  # Number of pixels that represent a length of .42 in the 3D space
+array([339.48195828])
 ```
 
 
