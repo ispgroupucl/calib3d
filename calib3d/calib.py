@@ -315,7 +315,7 @@ class Calib():
     def rotate(self, angle) -> 'Calib':
         if angle == 0:
             return self
-        A, new_width, new_height = compute_rotate(self.width, self.height, angle)
+        A, new_width, new_height = compute_rotate(self.width, self.height, angle, degrees=True)
         return self.update(K=A@self.K, width=new_width, height=new_height)
 
     def compute_length2D(self, length3D: float, point3D: Point3D) -> np.ndarray:
@@ -352,9 +352,10 @@ def line_plane_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
     dist = ((P-C).T @ n) / dot  # Distance between plane z=Z and camera
     return Point3D(C + dist.T*d)
 
-def compute_rotate(width, height, angle):
+def compute_rotate(width, height, angle, degrees=True):
     """ Computes rotation matrix and new width and height for a rotation of angle degrees of a widthxheight image.
     """
+    assert degrees, "Angle in gradient is not implemented (yet)"
     # Convert the OpenCV 3x2 rotation matrix to 3x3
     R = np.eye(3)
     R[0:2,:] = cv2.getRotationMatrix2D((width/2, height/2), angle, 1.0)
@@ -398,29 +399,33 @@ def parameters_to_affine_transform(angle: float, x_slice: slice, y_slice: slice,
     output_shape: tuple, do_flip: bool=False):
     """ Compute the affine transformation matrix that correspond to a
         - horizontal flip if `do_flip` is `True`, followed by a
-        - rotation of `angle` degrees around image center, followed by a
+        - rotation of `angle` degrees around output image center, followed by a
         - crop defined by `x_slice` and `y_slice`, followed by a
         - scale to recover `output_shape`.
     """
-    assert not do_flip, "There is a bug with random flip"
+    # Rotation
     R = np.eye(3)
-    center = ((y_slice.start + y_slice.stop)/2, (x_slice.start + x_slice.stop)/2)
+    center = ((x_slice.start + x_slice.stop)/2, (y_slice.start + y_slice.stop)/2)
     R[0:2,:] = cv2.getRotationMatrix2D(center, angle, 1.0)
 
+    # Crop
     x0 = x_slice.start
     y0 = y_slice.start
     width = x_slice.stop - x_slice.start
     height = y_slice.stop - y_slice.start
-    T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
+    C = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
 
+    # Scale
     sx = output_shape[0]/width
     sy = output_shape[1]/height
     S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
 
+    # Random Flip
+    assert not do_flip, "There is a bug with random flip"
     f = np.random.randint(0,2)*2-1 if do_flip else 1 # random sample in {-1,1}
     F = np.array([[f, 0, 0], [0, 1, 0], [0, 0, 1]])
 
-    return S@T@R@F
+    return S@C@R@F
 
 
 def compute_rotation_matrix(point3D: Point3D, camera3D: Point3D):
