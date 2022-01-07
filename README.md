@@ -1,11 +1,15 @@
 # Python camera calibration and projective geometry library
 
-This library offers several tools to ease manipulation of camera calibration, projective geometry and computations using homogenous coordinates. 
+This library offers several tools for manipulation of calibrated cameras, projective geometry and computations using homogenous coordinates. 
+
+Camera calibration allows to determine the relation between the camera's pixels (2D coordinates) and points in the real world
+(3D coordinates). It implies computation using homogenous coordinates. This python library aims at simplifying implementations
+of projective geometry computations, building on top of `numpy` and `cv2`.
 
 
 ## Installation
 
-Use the package pip manager to install `calib3d`:
+Installation using the package manager pip
 
 ```
 pip install calib3d
@@ -38,14 +42,14 @@ array([[0., 0., 1., 2., 3.],
 
 ### Camera calibration
 
-The `Calib` class that represent a calibrated camera. It has a serie of methods to handle 3D to 2D projections, 2D to 3D liftings, image transformations, and many more.
+The `Calib` class represents a calibrated camera. It has a serie of methods to handle 3D to 2D projections, 2D to 3D liftings, image transformations, and more.
 
 ```
+>>> import numpy as np
 >>> from calib3d import Calib, Point3D, compute_rotation_matrix
->>> f = 0.035                                      # lens focal length [m]    35 mm lens
->>> sensor_size = 0.01                             # sensor size       [m]    1 cm sensor width
->>> w, h = np.array([4000, 3000])                  # sensor size       [px²]  12 Mpx sensor
->>> d = w/sensor_size                              # pixel density     [m⁻¹]
+>>> f = 0.035                                      # lens focal length [m]      35 mm lens
+>>> w, h = np.array([4000, 3000])                  # sensor size       [px.px]  12 Mpx sensor
+>>> d = w/0.01                                     # pixel density     [px.m⁻¹] with a 1 cm sensor width
 >>> K = np.array([[ d*f,  0 , w/2 ],               # Camera matrix (intrinsic parameters)
 ...               [  0 , d*f, h/2 ],
 ...               [  0 ,  0 ,  1  ]])
