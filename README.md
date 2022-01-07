@@ -11,7 +11,7 @@ of projective geometry computations, building on top of `numpy` and `cv2`.
 
 Installation using the package manager pip
 
-```
+```shell
 pip install calib3d
 ```
 
@@ -24,7 +24,7 @@ Full API documentation is available in [here](https://ispgroupucl.github.io/cali
 
 The `Point2D` (and `Point3D`) class represent 2D (and 3D) points extending `numpy.ndarray`. Access to y coordinate of `point` is `point.y`, and access to homogenous coordinates is made easy with `point.H`, while it is still possible to use `point` with any `numpy` operators.
 
-```
+```python
 >>> Point2D(1,2) == Point2D(2,4,2)
 True
 
@@ -44,7 +44,7 @@ array([[0., 0., 1., 2., 3.],
 
 The `Calib` class represents a calibrated camera. It has a serie of methods to handle 3D to 2D projections, 2D to 3D liftings, image transformations, and more.
 
-```
+```python
 >>> import numpy as np
 >>> from calib3d import Calib, Point3D, compute_rotation_matrix
 >>> f = 0.035                                      # lens focal length [m]      35 mm lens
@@ -62,13 +62,13 @@ Point2D([[2000.],
 ```
 
 Cropping or scaling a calib is made easy with the following operations (for more operations, check the documentation)
-```
+```python
 >>> new_calib = calib.crop(x_slice=slice(10, 110, None), y_slice=slice(500, 600, None))
 >>> new_calib = calib.scale(output_width=2000, output_height=1500)
 ```
 
 Other useful methods
-```
+```python
 >>> calib.projects_in(Point3D(0, 20, 20))
 False
 
