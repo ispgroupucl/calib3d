@@ -31,6 +31,7 @@ of projective geometry computations, building on top of <code>numpy</code> and <
 <ul>
 <li><a href="./points.html">Computations with homogenous coordinates</a></li>
 <li><a href="./calib.html">Projective geometry and calibrated cameras</a></li>
+<li><a href="./draw.html">Drawing 3D objects on a 2D canvas using projective geometry</a></li>
 </ul>
 <details class="source">
 <summary>
@@ -47,11 +48,13 @@ The different modules are document here:
 
 - [Computations with homogenous coordinates](./points.html)
 - [Projective geometry and calibrated cameras](./calib.html)
+- [Drawing 3D objects on a 2D canvas using projective geometry](./draw.html)
 
 &#34;&#34;&#34;
 
 from .points import Point3D, Point2D
-from .calib import Calib, parameters_to_affine_transform, compute_rotation_matrix, line_plane_intersection</code></pre>
+from .calib import Calib, parameters_to_affine_transform, compute_rotation_matrix, line_plane_intersection
+from .draw import ProjectiveDrawer</code></pre>
 </details>
 </section>
 <section>
@@ -60,6 +63,10 @@ from .calib import Calib, parameters_to_affine_transform, compute_rotation_matri
 <dt><code class="name"><a title="calib3d.calib" href="calib.html">calib3d.calib</a></code></dt>
 <dd>
 <div class="desc"><p>Theoretical introduction …</p></div>
+</dd>
+<dt><code class="name"><a title="calib3d.draw" href="draw.html">calib3d.draw</a></code></dt>
+<dd>
+<div class="desc"><p>Projective Drawing …</p></div>
 </dd>
 <dt><code class="name"><a title="calib3d.points" href="points.html">calib3d.points</a></code></dt>
 <dd>
@@ -87,6 +94,7 @@ from .calib import Calib, parameters_to_affine_transform, compute_rotation_matri
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="calib3d.calib" href="calib.html">calib3d.calib</a></code></li>
+<li><code><a title="calib3d.draw" href="draw.html">calib3d.draw</a></code></li>
 <li><code><a title="calib3d.points" href="points.html">calib3d.points</a></code></li>
 <li><code><a title="calib3d.tf1" href="tf1/index.html">calib3d.tf1</a></code></li>
 </ul>
