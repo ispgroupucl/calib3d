@@ -9,8 +9,10 @@ The different modules are document here:
 
 - [Computations with homogenous coordinates](./points.html)
 - [Projective geometry and calibrated cameras](./calib.html)
+- [Drawing 3D objects on a 2D canvas using projective geometry](./draw.html)
 
 """
 
 from .points import Point3D, Point2D
 from .calib import Calib, parameters_to_affine_transform, compute_rotation_matrix, line_plane_intersection
+from .draw import ProjectiveDrawer

@@ -242,19 +242,28 @@ class Calib():
                                         np.logical_or(point2D.y < -self.height, point2D.y > 2*self.height))
         return Point2D(np.where(excluded_points, point2D, self.distort(point2D)))
 
-    def project_2D_to_3D(self, point2D: Point2D, Z: float) -> Point3D:
-        """ Using the calib object, project a 2D point in the 3D image space.
+    def project_2D_to_3D(self, point2D: Point2D, X: float=None, Y: float=None, Z: float=None) -> Point3D:
+        """ Using the calib object, project a 2D point in the 3D image space
+            given one of it's 3D coordinates (X,Y or Z). One and only one
+            coordinate must be given.
             Args:
                 point2D (Point2D): the 2D point to be projected
+                X (float): the X coordinate of the 3D point
+                Y (float): the Y coordinate of the 3D point
                 Z (float): the Z coordinate of the 3D point
             Returns:
-                The point in the 3D world for which the z=`Z` and that projects on `point2D`.
+                The point in the 3D world that projects on `point2D` and for
+                which the given coordinates is given.
         """
+        v = [X,Y,Z]
+        assert sum([1 for x in v if x is None]) == 2
         assert isinstance(point2D, Point2D), "Wrong argument type '{}'. Expected {}".format(type(point2D), Point2D)
         point2D = self.rectify(point2D)
         X = Point3D(self.Pinv @ point2D.H)
         d = (X - self.C)
-        return line_plane_intersection(self.C, d, Point3D(0, 0, Z), np.array([[0, 0, 1]]).T)
+        P = np.nan_to_num(Point3D(*v), 0)
+        v = np.array([[0 if x is None else 1 for x in v]]).T
+        return line_plane_intersection(self.C, d, P, v)
 
     def distort(self, point2D: Point2D) -> Point2D:
         """ Applies lens distortions to the given `point2D`.

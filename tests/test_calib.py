@@ -108,3 +108,7 @@ def test_compute_length():
     assert len(margin2D.shape) == 1
     assert margin2D - 107.677886 < EPS
 
+def test_project_X():
+    calib = Calib(K=K, R=R, kc=kc, T=T, width=width, height=height)
+    point3D = Point3D(1400,750,0)
+    assert np.all(calib.project_2D_to_3D(calib.project_3D_to_2D(point3D), X=1400) - point3D) < EPS
