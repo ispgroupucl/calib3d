@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    version="2.4.0",
+    version="2.5.0",
     name='calib3d',
     author='Gabriel Van Zandycke',
     author_email="gabriel.vanzandycke@hotmail.com",
