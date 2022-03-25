@@ -174,6 +174,7 @@ class Calib():
         self.P = self.K @ np.hstack((self.R, self.T))
         self.Pinv = np.linalg.pinv(self.P)
         self.Kinv = np.linalg.pinv(self.K)
+
     def update(self, **kwargs) -> 'Calib':
         """ Creates another Calib object with the given keyword arguments updated
             Args:
@@ -459,3 +460,5 @@ def compute_rotation_matrix(point3D: Point3D, camera3D: Point3D):
     # `O = R @ B` (where `O` := `np.identity(3)`)
     R = B.T # inv(B) == B.T since R is a rotation matrix
     return R
+
+
