@@ -25,37 +25,37 @@ class ProjectiveDrawer():
         self.calib = calib
         self.segments = segments
 
-    def polylines(self, canvas, points: Point2D, thickness: int=None):
+    def polylines(self, canvas, points: Point2D, color=None, thickness: int=None):
         thickness = thickness or self.thickness
+        color = color or self.color
         if isinstance(canvas, np.ndarray):
             points = points.astype(np.int32).T.reshape((-1,1,2))
             if thickness < 0:
-                cv2.fillPoly(canvas, [points], color=self.color)
+                cv2.fillPoly(canvas, [points], color=color)
             else:
-                cv2.polylines(canvas, [points], False, color=self.color, thickness=thickness)
+                cv2.polylines(canvas, [points], False, color=color, thickness=thickness)
         else:
             if thickness < 0:
                 raise NotImplementedError()
             else:
-                canvas.plot(points.x, points.y, linewidth=thickness, color=np.array(self.color)/255)
+                canvas.plot(points.x, points.y, linewidth=thickness, color=np.array(color)/255)
 
-    def draw_line(self, canvas, point3D1: Point3D, point3D2: Point3D, thickness: int=None):
+    def draw_line(self, canvas, point3D1: Point3D, point3D2: Point3D, color=None, thickness: int=None):
         try:
             point3D1, point3D2 = visible_segment(self.calib, point3D1, point3D2)
         except ValueError:
             return
         points3D = Point3D(np.linspace(point3D1, point3D2, self.segments+1))
-        self.polylines(canvas, self.calib.project_3D_to_2D(points3D), thickness=thickness)
+        self.polylines(canvas, self.calib.project_3D_to_2D(points3D), color=color, thickness=thickness)
 
     def draw_arc(self, canvas, center, radius, start_angle=0.0, stop_angle=2*np.pi, color=None, thickness=None):
-        color = color or self.color
         thickness = thickness or self.thickness
         angles = np.linspace(start_angle, stop_angle, self.segments*4+1)
         xs = np.cos(angles)*radius + center.x
         ys = np.sin(angles)*radius + center.y
         zs = np.ones_like(angles)*center.z
         points3D = Point3D(np.vstack((xs,ys,zs)))
-        self.polylines(canvas, self.calib.project_3D_to_2D(points3D), thickness=thickness)
+        self.polylines(canvas, self.calib.project_3D_to_2D(points3D), color=color, thickness=thickness)
 
     def draw_rectangle(self, canvas, point3D1, point3D2):
         c1 = point3D1
