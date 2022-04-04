@@ -23,4 +23,8 @@ setup(
         "numpy",
         "opencv-python"
     ],
+    extras_requires={
+        "tensorflow": ["tensorflow>=2.4"],
+        "pycuda": ["pycuda"]
+    }
 )
