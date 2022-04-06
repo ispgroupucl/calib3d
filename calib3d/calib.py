@@ -234,7 +234,7 @@ class Calib():
             Returns:
                 The point in the 2D image space on which point3D is projected by calib
         """
-        assert isinstance(point3D, Point3D), "Wrong argument type '{}'. Expected {}".format(type(point3D), Point3D)
+        #assert isinstance(point3D, Point3D), "Wrong argument type '{}'. Expected {}".format(type(point3D), Point3D)
         point2D_H = self.P @ point3D.H # returns a np.ndarray object
         point2D_H[2] = point2D_H[2] * np.sign(point2D_H[2]) # correct projection of points being projected behind the camera
         point2D = Point2D(point2D_H)
