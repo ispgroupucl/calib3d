@@ -90,7 +90,7 @@ The opposite operation requires to invert \(P\) and is done by pseudo-inverse in
 We need a model of the distortions brought by the lens:
 
 - **radial** distortion cause lines far from principal point to look distorted.
-- **tangential** distortion: occur when lens is not prefectly align with the \(z\) axis of the camera. 
+- **tangential** distortion: occur when lens is not prefectly align with the \(z\) axis of the camera.
 
 Many lens distortion models exist. Here, we will use the model used in [opencv](https://docs.opencv.org/3.1.0/d4/d94/tutorial_camera_calibration.html).
 
@@ -133,7 +133,7 @@ $$\left\{\begin{align}
     \left(1 + k_1 {r_u}^2 + k_2 {r_u}^4 + k_3 {r_u}^6+\cdots\right) &\approx \left(1 + k_1 {r_d}^2 + k_2 {r_d}^4 + k_3 {r_d}^6+\cdots\right)
    \end{align}\right.
     $$
-    
+
 If this approximation holds, it's much easier to get an analytical expression of \(x_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)\) and \(y_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)\).
 
 
@@ -327,6 +327,15 @@ class Calib():
             return self
         A, new_width, new_height = compute_rotate(self.width, self.height, angle, degrees=True)
         return self.update(K=A@self.K, width=new_width, height=new_height)
+
+    def rot90(self, k) -> 'Calib':
+        """ Returns a calib corresponding to a camera that was rotated `k` times around it's main axis.
+            k (int) : Number of times the array is rotated by 90 degrees.
+        """
+        raise NotImplementedError("Method not tested")
+        R = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])**k
+        transpose = k % 2
+        return self.update(K=R@self.K, width=self.height if transpose else self.width, height=self.width if transpose else self.height)
 
     def compute_length2D(self, length3D: float, point3D: Point3D) -> np.ndarray:
         """ Returns the length in pixel of a 3D length at point3D
