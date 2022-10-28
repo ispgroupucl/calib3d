@@ -234,7 +234,7 @@ class Calib():
             Returns:
                 The point in the 2D image space on which point3D is projected by calib
         """
-        assert isinstance(point3D, Point3D), "Wrong argument type '{}'. Expected {}".format(type(point3D), Point3D)
+        #assert isinstance(point3D, Point3D), "Wrong argument type '{}'. Expected {}".format(type(point3D), Point3D)
         point2D_H = self.P @ point3D.H # returns a np.ndarray object
         point2D_H[2] = point2D_H[2] * np.sign(point2D_H[2]) # correct projection of points being projected behind the camera
         point2D = Point2D(point2D_H)
@@ -312,11 +312,13 @@ class Calib():
         T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
         return self.update(width=width, height=height, K=T@self.K)
 
-    def scale(self, output_width, output_height) -> 'Calib':
-        sx = output_width/self.width
-        sy = output_height/self.height
+    def scale(self, output_width=None, output_height=None, sx=None, sy=None) -> 'Calib':
+        sx = sx or output_width/self.width
+        sy = sy or output_height/self.height
+        width = output_width or int(self.width*sx)
+        height = output_height or int(self.height*sy)
         S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
-        return self.update(width=output_width, height=output_height, K=S@self.K)
+        return self.update(width=width, height=height, K=S@self.K)
 
     def flip(self) -> 'Calib':
         F = np.array([[-1, 0, self.width-1], [0, 1, 0], [0, 0, 1]])
@@ -354,6 +356,15 @@ class Calib():
         point2D = self.project_3D_to_2D(point3D)
         cond = np.stack((point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width, point2D.y <= self.height))
         return np.all(cond, axis=0)
+
+    def is_behind(self, point3D: Point3D) -> np.ndarray:
+        n = Point3D(0,0,1) # normal to the camera plane in camera 3D coordinates system
+        point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # point3D expressed in camera 3D coordinates system
+        return np.asarray((n.T @ point3D_c)[0] < 0)
+
+    def __str__(self):
+        return f"Calib object ({self.width}×{self.height})@({self.C.x: 1.6g},{self.C.y: 1.6g},{self.C.z: 1.6g})"
+
 
 def line_plane_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
     """ Finds the intersection between a line and a plane.

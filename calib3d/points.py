@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractproperty
+import warnings
 import numpy as np
 
 __doc__ = r"""
@@ -44,7 +45,7 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
         invalid_shape_message = "Invalid input shape:\n" \
             "Expected a 2D np.array of shape ({l1},N) or (N,{l1},1) in non-homogenous coordinates\n" \
             "                       or shape ({l2},N) or (N,{l2},1) in homogenous coordinates\n" \
-            "Received a np.array of shape {shape}".format(l1=len(cls._coord_names), l2=len(cls._coord_names)+1, shape=array.shape)
+            "Received a np.array of shape {shape}".format(l1=cls.D, l2=cls.D+1, shape=array.shape)
         if len(array.shape) == 1:
             array = array[:, np.newaxis]
         elif len(array.shape) == 2:
@@ -54,12 +55,12 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
         else:
             raise ValueError(invalid_shape_message)
 
-        if array.shape[0] == len(cls._coord_names): # point(s) given in non-homogenous coordinates
+        if array.shape[0] == cls.D: # point(s) given in non-homogenous coordinates
             pass
-        elif array.shape[0] == len(cls._coord_names)+1: # point(s) given in homogenous coordinates
-            array = array[0:len(cls._coord_names),:]/array[len(cls._coord_names),:]
+        elif array.shape[0] == cls.D+1: # point(s) given in homogenous coordinates
+            array = array[0:cls.D,:]/array[cls.D,:]
         elif array.shape[0] == 0: # point given from an empty list should be an empty point
-            array = np.empty((len(cls._coord_names),0))
+            array = np.empty((cls.D,0))
         else:
             raise ValueError(invalid_shape_message)
         return array.astype(np.float64).view(cls)
@@ -79,7 +80,7 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
     @property
     def H(self):
         """ Point expressed in homogenous coordinates with an homogenous component equal to `1`.
-        
+
         Example:
         ```
         >>> p = Point3D(1,2,3)
@@ -150,14 +151,37 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
     _get_coord = lambda self, i:        np.asarray(super().__getitem__((i,0)))       if self.shape[1] == 1 else np.asarray(super().__getitem__(i))
     _set_coord = lambda self, i, value:            super().__setitem__((i,0), value) if self.shape[1] == 1 else            super().__setitem__((i), value)
 
-class Point3D(HomogeneousCoordinatesPoint):
-    """ Numpy representation of a single 3D point or a list of 3D points
-    """
-    D = 3
-    _coord_names = ("x","y","z")
 
 class Point2D(HomogeneousCoordinatesPoint):
     """ Numpy representation of a single 2D point or a list of 2D points
     """
     D = 2
     _coord_names = ("x","y")
+
+class Point3D(HomogeneousCoordinatesPoint):
+    """ Numpy representation of a single 3D point or a list of 3D points
+    """
+    D = 3
+    _coord_names = ("x","y","z")
+    @property
+    def V(self):
+        array = self.H
+        array[-1] = 0
+        return VanishingPoint(array)
+
+class VanishingPoint(Point3D):
+    """ Object allowing representation of Vanishing point (with null homogenous
+        coordinate). Only the `H` attribute should be used. Handle with care.
+    """
+    def __new__(cls, array):
+        warnings.warn("Vanishing Point feature has not yet been fully tested")
+        obj = array.astype(np.float64).view(cls)
+        obj.array = array
+        return obj
+    @property
+    def H(self):
+        return self.array
+    def __getattribute__(self, attr_name):
+        if attr_name not in ("H", "__array_finalize__", "array", "shape", "size", "ndim", "x", "y", "z", "_get_coord", "close", "__class__", "astype", "view"):
+            raise AttributeError(f"VanishingPoint has no `{attr_name}` attribute.")
+        return super().__getattribute__(attr_name)
