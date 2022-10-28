@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractproperty
+import warnings
 import numpy as np
 
 __doc__ = r"""
@@ -79,7 +80,7 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
     @property
     def H(self):
         """ Point expressed in homogenous coordinates with an homogenous component equal to `1`.
-        
+
         Example:
         ```
         >>> p = Point3D(1,2,3)
@@ -173,6 +174,7 @@ class VanishingPoint(Point3D):
         coordinate). Only the `H` attribute should be used. Handle with care.
     """
     def __new__(cls, array):
+        warnings.warn("Vanishing Point feature has not yet been fully tested")
         obj = array.astype(np.float64).view(cls)
         obj.array = array
         return obj
