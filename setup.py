@@ -25,6 +25,7 @@ setup(
     ],
     extras_requires={
         "tensorflow": ["tensorflow>=2.4"],
-        "pycuda": ["pycuda"]
+        "pycuda": ["pycuda"],
+	"matplotlib": ["matplotlib"],
     }
 )
