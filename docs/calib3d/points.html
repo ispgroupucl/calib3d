@@ -37,6 +37,7 @@ while it is still possible to use point with any numpy operators.</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from abc import ABCMeta, abstractproperty
+import warnings
 import numpy as np
 
 __doc__ = r&#34;&#34;&#34;
@@ -82,7 +83,7 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
         invalid_shape_message = &#34;Invalid input shape:\n&#34; \
             &#34;Expected a 2D np.array of shape ({l1},N) or (N,{l1},1) in non-homogenous coordinates\n&#34; \
             &#34;                       or shape ({l2},N) or (N,{l2},1) in homogenous coordinates\n&#34; \
-            &#34;Received a np.array of shape {shape}&#34;.format(l1=len(cls._coord_names), l2=len(cls._coord_names)+1, shape=array.shape)
+            &#34;Received a np.array of shape {shape}&#34;.format(l1=cls.D, l2=cls.D+1, shape=array.shape)
         if len(array.shape) == 1:
             array = array[:, np.newaxis]
         elif len(array.shape) == 2:
@@ -92,12 +93,12 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
         else:
             raise ValueError(invalid_shape_message)
 
-        if array.shape[0] == len(cls._coord_names): # point(s) given in non-homogenous coordinates
+        if array.shape[0] == cls.D: # point(s) given in non-homogenous coordinates
             pass
-        elif array.shape[0] == len(cls._coord_names)+1: # point(s) given in homogenous coordinates
-            array = array[0:len(cls._coord_names),:]/array[len(cls._coord_names),:]
+        elif array.shape[0] == cls.D+1: # point(s) given in homogenous coordinates
+            array = array[0:cls.D,:]/array[cls.D,:]
         elif array.shape[0] == 0: # point given from an empty list should be an empty point
-            array = np.empty((len(cls._coord_names),0))
+            array = np.empty((cls.D,0))
         else:
             raise ValueError(invalid_shape_message)
         return array.astype(np.float64).view(cls)
@@ -117,7 +118,7 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
     @property
     def H(self):
         &#34;&#34;&#34; Point expressed in homogenous coordinates with an homogenous component equal to `1`.
-        
+
         Example:
         ```
         &gt;&gt;&gt; p = Point3D(1,2,3)
@@ -188,17 +189,40 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
     _get_coord = lambda self, i:        np.asarray(super().__getitem__((i,0)))       if self.shape[1] == 1 else np.asarray(super().__getitem__(i))
     _set_coord = lambda self, i, value:            super().__setitem__((i,0), value) if self.shape[1] == 1 else            super().__setitem__((i), value)
 
-class Point3D(HomogeneousCoordinatesPoint):
-    &#34;&#34;&#34; Numpy representation of a single 3D point or a list of 3D points
-    &#34;&#34;&#34;
-    D = 3
-    _coord_names = (&#34;x&#34;,&#34;y&#34;,&#34;z&#34;)
 
 class Point2D(HomogeneousCoordinatesPoint):
     &#34;&#34;&#34; Numpy representation of a single 2D point or a list of 2D points
     &#34;&#34;&#34;
     D = 2
-    _coord_names = (&#34;x&#34;,&#34;y&#34;)</code></pre>
+    _coord_names = (&#34;x&#34;,&#34;y&#34;)
+
+class Point3D(HomogeneousCoordinatesPoint):
+    &#34;&#34;&#34; Numpy representation of a single 3D point or a list of 3D points
+    &#34;&#34;&#34;
+    D = 3
+    _coord_names = (&#34;x&#34;,&#34;y&#34;,&#34;z&#34;)
+    @property
+    def V(self):
+        array = self.H
+        array[-1] = 0
+        return VanishingPoint(array)
+
+class VanishingPoint(Point3D):
+    &#34;&#34;&#34; Object allowing representation of Vanishing point (with null homogenous
+        coordinate). Only the `H` attribute should be used. Handle with care.
+    &#34;&#34;&#34;
+    def __new__(cls, array):
+        warnings.warn(&#34;Vanishing Point feature has not yet been fully tested&#34;)
+        obj = array.astype(np.float64).view(cls)
+        obj.array = array
+        return obj
+    @property
+    def H(self):
+        return self.array
+    def __getattribute__(self, attr_name):
+        if attr_name not in (&#34;H&#34;, &#34;__array_finalize__&#34;, &#34;array&#34;, &#34;shape&#34;, &#34;size&#34;, &#34;ndim&#34;, &#34;x&#34;, &#34;y&#34;, &#34;z&#34;, &#34;_get_coord&#34;, &#34;close&#34;, &#34;__class__&#34;, &#34;astype&#34;, &#34;view&#34;):
+            raise AttributeError(f&#34;VanishingPoint has no `{attr_name}` attribute.&#34;)
+        return super().__getattribute__(attr_name)</code></pre>
 </details>
 </section>
 <section>
@@ -257,7 +281,7 @@ Point2D([[1.],
         invalid_shape_message = &#34;Invalid input shape:\n&#34; \
             &#34;Expected a 2D np.array of shape ({l1},N) or (N,{l1},1) in non-homogenous coordinates\n&#34; \
             &#34;                       or shape ({l2},N) or (N,{l2},1) in homogenous coordinates\n&#34; \
-            &#34;Received a np.array of shape {shape}&#34;.format(l1=len(cls._coord_names), l2=len(cls._coord_names)+1, shape=array.shape)
+            &#34;Received a np.array of shape {shape}&#34;.format(l1=cls.D, l2=cls.D+1, shape=array.shape)
         if len(array.shape) == 1:
             array = array[:, np.newaxis]
         elif len(array.shape) == 2:
@@ -267,12 +291,12 @@ Point2D([[1.],
         else:
             raise ValueError(invalid_shape_message)
 
-        if array.shape[0] == len(cls._coord_names): # point(s) given in non-homogenous coordinates
+        if array.shape[0] == cls.D: # point(s) given in non-homogenous coordinates
             pass
-        elif array.shape[0] == len(cls._coord_names)+1: # point(s) given in homogenous coordinates
-            array = array[0:len(cls._coord_names),:]/array[len(cls._coord_names),:]
+        elif array.shape[0] == cls.D+1: # point(s) given in homogenous coordinates
+            array = array[0:cls.D,:]/array[cls.D,:]
         elif array.shape[0] == 0: # point given from an empty list should be an empty point
-            array = np.empty((len(cls._coord_names),0))
+            array = np.empty((cls.D,0))
         else:
             raise ValueError(invalid_shape_message)
         return array.astype(np.float64).view(cls)
@@ -292,7 +316,7 @@ Point2D([[1.],
     @property
     def H(self):
         &#34;&#34;&#34; Point expressed in homogenous coordinates with an homogenous component equal to `1`.
-        
+
         Example:
         ```
         &gt;&gt;&gt; p = Point3D(1,2,3)
@@ -392,7 +416,7 @@ array([[1.],
 <pre><code class="python">@property
 def H(self):
     &#34;&#34;&#34; Point expressed in homogenous coordinates with an homogenous component equal to `1`.
-    
+
     Example:
     ```
     &gt;&gt;&gt; p = Point3D(1,2,3)
@@ -605,18 +629,44 @@ hence "closing" the polygon defined by the initial points.</p>
     &#34;&#34;&#34; Numpy representation of a single 3D point or a list of 3D points
     &#34;&#34;&#34;
     D = 3
-    _coord_names = (&#34;x&#34;,&#34;y&#34;,&#34;z&#34;)</code></pre>
+    _coord_names = (&#34;x&#34;,&#34;y&#34;,&#34;z&#34;)
+    @property
+    def V(self):
+        array = self.H
+        array[-1] = 0
+        return VanishingPoint(array)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="calib3d.points.HomogeneousCoordinatesPoint" href="#calib3d.points.HomogeneousCoordinatesPoint">HomogeneousCoordinatesPoint</a></li>
 <li>numpy.ndarray</li>
 </ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="calib3d.points.VanishingPoint" href="#calib3d.points.VanishingPoint">VanishingPoint</a></li>
+</ul>
 <h3>Class variables</h3>
 <dl>
 <dt id="calib3d.points.Point3D.D"><code class="name">var <span class="ident">D</span></code></dt>
 <dd>
 <div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="calib3d.points.Point3D.V"><code class="name">var <span class="ident">V</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def V(self):
+    array = self.H
+    array[-1] = 0
+    return VanishingPoint(array)</code></pre>
+</details>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -632,6 +682,57 @@ hence "closing" the polygon defined by the initial points.</p>
 <li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.x" href="#calib3d.points.HomogeneousCoordinatesPoint.x">x</a></code></li>
 <li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.y" href="#calib3d.points.HomogeneousCoordinatesPoint.y">y</a></code></li>
 <li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.z" href="#calib3d.points.HomogeneousCoordinatesPoint.z">z</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="calib3d.points.VanishingPoint"><code class="flex name class">
+<span>class <span class="ident">VanishingPoint</span></span>
+<span>(</span><span>array)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Object allowing representation of Vanishing point (with null homogenous
+coordinate). Only the <code>H</code> attribute should be used. Handle with care.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class VanishingPoint(Point3D):
+    &#34;&#34;&#34; Object allowing representation of Vanishing point (with null homogenous
+        coordinate). Only the `H` attribute should be used. Handle with care.
+    &#34;&#34;&#34;
+    def __new__(cls, array):
+        warnings.warn(&#34;Vanishing Point feature has not yet been fully tested&#34;)
+        obj = array.astype(np.float64).view(cls)
+        obj.array = array
+        return obj
+    @property
+    def H(self):
+        return self.array
+    def __getattribute__(self, attr_name):
+        if attr_name not in (&#34;H&#34;, &#34;__array_finalize__&#34;, &#34;array&#34;, &#34;shape&#34;, &#34;size&#34;, &#34;ndim&#34;, &#34;x&#34;, &#34;y&#34;, &#34;z&#34;, &#34;_get_coord&#34;, &#34;close&#34;, &#34;__class__&#34;, &#34;astype&#34;, &#34;view&#34;):
+            raise AttributeError(f&#34;VanishingPoint has no `{attr_name}` attribute.&#34;)
+        return super().__getattribute__(attr_name)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="calib3d.points.Point3D" href="#calib3d.points.Point3D">Point3D</a></li>
+<li><a title="calib3d.points.HomogeneousCoordinatesPoint" href="#calib3d.points.HomogeneousCoordinatesPoint">HomogeneousCoordinatesPoint</a></li>
+<li>numpy.ndarray</li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="calib3d.points.Point3D" href="#calib3d.points.Point3D">Point3D</a></b></code>:
+<ul class="hlist">
+<li><code><a title="calib3d.points.Point3D.H" href="#calib3d.points.HomogeneousCoordinatesPoint.H">H</a></code></li>
+<li><code><a title="calib3d.points.Point3D.close" href="#calib3d.points.HomogeneousCoordinatesPoint.close">close</a></code></li>
+<li><code><a title="calib3d.points.Point3D.flatten" href="#calib3d.points.HomogeneousCoordinatesPoint.flatten">flatten</a></code></li>
+<li><code><a title="calib3d.points.Point3D.linspace" href="#calib3d.points.HomogeneousCoordinatesPoint.linspace">linspace</a></code></li>
+<li><code><a title="calib3d.points.Point3D.to_int_tuple" href="#calib3d.points.HomogeneousCoordinatesPoint.to_int_tuple">to_int_tuple</a></code></li>
+<li><code><a title="calib3d.points.Point3D.to_list" href="#calib3d.points.HomogeneousCoordinatesPoint.to_list">to_list</a></code></li>
+<li><code><a title="calib3d.points.Point3D.x" href="#calib3d.points.HomogeneousCoordinatesPoint.x">x</a></code></li>
+<li><code><a title="calib3d.points.Point3D.y" href="#calib3d.points.HomogeneousCoordinatesPoint.y">y</a></code></li>
+<li><code><a title="calib3d.points.Point3D.z" href="#calib3d.points.HomogeneousCoordinatesPoint.z">z</a></code></li>
 </ul>
 </li>
 </ul>
@@ -678,7 +779,11 @@ hence "closing" the polygon defined by the initial points.</p>
 <h4><code><a title="calib3d.points.Point3D" href="#calib3d.points.Point3D">Point3D</a></code></h4>
 <ul class="">
 <li><code><a title="calib3d.points.Point3D.D" href="#calib3d.points.Point3D.D">D</a></code></li>
+<li><code><a title="calib3d.points.Point3D.V" href="#calib3d.points.Point3D.V">V</a></code></li>
 </ul>
+</li>
+<li>
+<h4><code><a title="calib3d.points.VanishingPoint" href="#calib3d.points.VanishingPoint">VanishingPoint</a></code></h4>
 </li>
 </ul>
 </li>

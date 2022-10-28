@@ -1,5 +1,4 @@
 import cv2
-import matplotlib as mpl
 import numpy as np
 
 from calib3d import Calib, Point2D, Point3D
@@ -36,9 +35,12 @@ class ProjectiveDrawer():
                 cv2.polylines(canvas, [points], False, color=color, thickness=thickness, **kwargs)
         else:
             if thickness < 0:
-                p = mpl.patches.Polygon(np.array(list(zip(points.x, points.y))), facecolor=np.array(color)/255, alpha=.35)
-                canvas.add_patch(p)
-                #raise NotImplementedError()
+                try:
+                    import matplotlib as mpl
+                    p = mpl.patches.Polygon(np.array(list(zip(points.x, points.y))), facecolor=np.array(color)/255, alpha=.35)
+                    canvas.add_patch(p)
+                except ImportError:
+                    raise ImportError("The current implementation requires matplotlib")
             else:
                 canvas.plot(points.x, points.y, linewidth=thickness, color=np.array(color)/255, **kwargs)
 

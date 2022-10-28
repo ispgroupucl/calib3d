@@ -92,7 +92,7 @@ R_{3\times 3} & T_{3\times 1}\\{\bf 0}_{1\times 3}&1
 <p>We need a model of the distortions brought by the lens:</p>
 <ul>
 <li><strong>radial</strong> distortion cause lines far from principal point to look distorted.</li>
-<li><strong>tangential</strong> distortion: occur when lens is not prefectly align with the <span><span class="MathJax_Preview">z</span><script type="math/tex">z</script></span> axis of the camera. </li>
+<li><strong>tangential</strong> distortion: occur when lens is not prefectly align with the <span><span class="MathJax_Preview">z</span><script type="math/tex">z</script></span> axis of the camera.</li>
 </ul>
 <p>Many lens distortion models exist. Here, we will use the model used in <a href="https://docs.opencv.org/3.1.0/d4/d94/tutorial_camera_calibration.html">opencv</a>.</p>
 <h2 id="distortion-models">Distortion models</h2>
@@ -239,7 +239,7 @@ The opposite operation requires to invert \(P\) and is done by pseudo-inverse in
 We need a model of the distortions brought by the lens:
 
 - **radial** distortion cause lines far from principal point to look distorted.
-- **tangential** distortion: occur when lens is not prefectly align with the \(z\) axis of the camera. 
+- **tangential** distortion: occur when lens is not prefectly align with the \(z\) axis of the camera.
 
 Many lens distortion models exist. Here, we will use the model used in [opencv](https://docs.opencv.org/3.1.0/d4/d94/tutorial_camera_calibration.html).
 
@@ -282,7 +282,7 @@ $$\left\{\begin{align}
     \left(1 + k_1 {r_u}^2 + k_2 {r_u}^4 + k_3 {r_u}^6+\cdots\right) &amp;\approx \left(1 + k_1 {r_d}^2 + k_2 {r_d}^4 + k_3 {r_d}^6+\cdots\right)
    \end{align}\right.
     $$
-    
+
 If this approximation holds, it&#39;s much easier to get an analytical expression of \(x_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)\) and \(y_u=f_{k_{1,2,3},p_{1,2}}(x_d,y_d)\).
 
 
@@ -383,7 +383,7 @@ class Calib():
             Returns:
                 The point in the 2D image space on which point3D is projected by calib
         &#34;&#34;&#34;
-        assert isinstance(point3D, Point3D), &#34;Wrong argument type &#39;{}&#39;. Expected {}&#34;.format(type(point3D), Point3D)
+        #assert isinstance(point3D, Point3D), &#34;Wrong argument type &#39;{}&#39;. Expected {}&#34;.format(type(point3D), Point3D)
         point2D_H = self.P @ point3D.H # returns a np.ndarray object
         point2D_H[2] = point2D_H[2] * np.sign(point2D_H[2]) # correct projection of points being projected behind the camera
         point2D = Point2D(point2D_H)
@@ -461,11 +461,13 @@ class Calib():
         T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
         return self.update(width=width, height=height, K=T@self.K)
 
-    def scale(self, output_width, output_height) -&gt; &#39;Calib&#39;:
-        sx = output_width/self.width
-        sy = output_height/self.height
+    def scale(self, output_width=None, output_height=None, sx=None, sy=None) -&gt; &#39;Calib&#39;:
+        sx = sx or output_width/self.width
+        sy = sy or output_height/self.height
+        width = output_width or int(self.width*sx)
+        height = output_height or int(self.height*sy)
         S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
-        return self.update(width=output_width, height=output_height, K=S@self.K)
+        return self.update(width=width, height=height, K=S@self.K)
 
     def flip(self) -&gt; &#39;Calib&#39;:
         F = np.array([[-1, 0, self.width-1], [0, 1, 0], [0, 0, 1]])
@@ -476,6 +478,15 @@ class Calib():
             return self
         A, new_width, new_height = compute_rotate(self.width, self.height, angle, degrees=True)
         return self.update(K=A@self.K, width=new_width, height=new_height)
+
+    def rot90(self, k) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Returns a calib corresponding to a camera that was rotated `k` times around it&#39;s main axis.
+            k (int) : Number of times the array is rotated by 90 degrees.
+        &#34;&#34;&#34;
+        raise NotImplementedError(&#34;Method not tested&#34;)
+        R = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])**k
+        transpose = k % 2
+        return self.update(K=R@self.K, width=self.height if transpose else self.width, height=self.width if transpose else self.height)
 
     def compute_length2D(self, length3D: float, point3D: Point3D) -&gt; np.ndarray:
         &#34;&#34;&#34; Returns the length in pixel of a 3D length at point3D
@@ -494,6 +505,15 @@ class Calib():
         point2D = self.project_3D_to_2D(point3D)
         cond = np.stack((point2D.x &gt;= 0, point2D.y &gt;= 0, point2D.x &lt;= self.width, point2D.y &lt;= self.height))
         return np.all(cond, axis=0)
+
+    def is_behind(self, point3D: Point3D) -&gt; np.ndarray:
+        n = Point3D(0,0,1) # normal to the camera plane in camera 3D coordinates system
+        point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # point3D expressed in camera 3D coordinates system
+        return np.asarray((n.T @ point3D_c)[0] &lt; 0)
+
+    def __str__(self):
+        return f&#34;Calib object ({self.width}×{self.height})@({self.C.x: 1.6g},{self.C.y: 1.6g},{self.C.z: 1.6g})&#34;
+
 
 def line_plane_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
     &#34;&#34;&#34; Finds the intersection between a line and a plane.
@@ -913,7 +933,7 @@ The returned image will be large enough to hold the entire new image, with a bla
             Returns:
                 The point in the 2D image space on which point3D is projected by calib
         &#34;&#34;&#34;
-        assert isinstance(point3D, Point3D), &#34;Wrong argument type &#39;{}&#39;. Expected {}&#34;.format(type(point3D), Point3D)
+        #assert isinstance(point3D, Point3D), &#34;Wrong argument type &#39;{}&#39;. Expected {}&#34;.format(type(point3D), Point3D)
         point2D_H = self.P @ point3D.H # returns a np.ndarray object
         point2D_H[2] = point2D_H[2] * np.sign(point2D_H[2]) # correct projection of points being projected behind the camera
         point2D = Point2D(point2D_H)
@@ -991,11 +1011,13 @@ The returned image will be large enough to hold the entire new image, with a bla
         T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
         return self.update(width=width, height=height, K=T@self.K)
 
-    def scale(self, output_width, output_height) -&gt; &#39;Calib&#39;:
-        sx = output_width/self.width
-        sy = output_height/self.height
+    def scale(self, output_width=None, output_height=None, sx=None, sy=None) -&gt; &#39;Calib&#39;:
+        sx = sx or output_width/self.width
+        sy = sy or output_height/self.height
+        width = output_width or int(self.width*sx)
+        height = output_height or int(self.height*sy)
         S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
-        return self.update(width=output_width, height=output_height, K=S@self.K)
+        return self.update(width=width, height=height, K=S@self.K)
 
     def flip(self) -&gt; &#39;Calib&#39;:
         F = np.array([[-1, 0, self.width-1], [0, 1, 0], [0, 0, 1]])
@@ -1006,6 +1028,15 @@ The returned image will be large enough to hold the entire new image, with a bla
             return self
         A, new_width, new_height = compute_rotate(self.width, self.height, angle, degrees=True)
         return self.update(K=A@self.K, width=new_width, height=new_height)
+
+    def rot90(self, k) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Returns a calib corresponding to a camera that was rotated `k` times around it&#39;s main axis.
+            k (int) : Number of times the array is rotated by 90 degrees.
+        &#34;&#34;&#34;
+        raise NotImplementedError(&#34;Method not tested&#34;)
+        R = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])**k
+        transpose = k % 2
+        return self.update(K=R@self.K, width=self.height if transpose else self.width, height=self.width if transpose else self.height)
 
     def compute_length2D(self, length3D: float, point3D: Point3D) -&gt; np.ndarray:
         &#34;&#34;&#34; Returns the length in pixel of a 3D length at point3D
@@ -1023,7 +1054,15 @@ The returned image will be large enough to hold the entire new image, with a bla
         &#34;&#34;&#34;
         point2D = self.project_3D_to_2D(point3D)
         cond = np.stack((point2D.x &gt;= 0, point2D.y &gt;= 0, point2D.x &lt;= self.width, point2D.y &lt;= self.height))
-        return np.all(cond, axis=0)</code></pre>
+        return np.all(cond, axis=0)
+
+    def is_behind(self, point3D: Point3D) -&gt; np.ndarray:
+        n = Point3D(0,0,1) # normal to the camera plane in camera 3D coordinates system
+        point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # point3D expressed in camera 3D coordinates system
+        return np.asarray((n.T @ point3D_c)[0] &lt; 0)
+
+    def __str__(self):
+        return f&#34;Calib object ({self.width}×{self.height})@({self.C.x: 1.6g},{self.C.y: 1.6g},{self.C.z: 1.6g})&#34;</code></pre>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
@@ -1219,6 +1258,21 @@ def dict(self) -&gt; dict:
     return self.update(K=F@self.K)</code></pre>
 </details>
 </dd>
+<dt id="calib3d.calib.Calib.is_behind"><code class="name flex">
+<span>def <span class="ident">is_behind</span></span>(<span>self, point3D: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_behind(self, point3D: Point3D) -&gt; np.ndarray:
+    n = Point3D(0,0,1) # normal to the camera plane in camera 3D coordinates system
+    point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # point3D expressed in camera 3D coordinates system
+    return np.asarray((n.T @ point3D_c)[0] &lt; 0)</code></pre>
+</details>
+</dd>
 <dt id="calib3d.calib.Calib.project_2D_to_3D"><code class="name flex">
 <span>def <span class="ident">project_2D_to_3D</span></span>(<span>self, point2D: <a title="calib3d.points.Point2D" href="points.html#calib3d.points.Point2D">Point2D</a>, X: float = None, Y: float = None, Z: float = None) ‑> <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a></span>
 </code></dt>
@@ -1291,7 +1345,7 @@ which the given coordinates is given.</p></div>
         Returns:
             The point in the 2D image space on which point3D is projected by calib
     &#34;&#34;&#34;
-    assert isinstance(point3D, Point3D), &#34;Wrong argument type &#39;{}&#39;. Expected {}&#34;.format(type(point3D), Point3D)
+    #assert isinstance(point3D, Point3D), &#34;Wrong argument type &#39;{}&#39;. Expected {}&#34;.format(type(point3D), Point3D)
     point2D_H = self.P @ point3D.H # returns a np.ndarray object
     point2D_H[2] = point2D_H[2] * np.sign(point2D_H[2]) # correct projection of points being projected behind the camera
     point2D = Point2D(point2D_H)
@@ -1348,6 +1402,26 @@ Returns <code>True</code> where for points that projects in the image and <code>
     return point2D</code></pre>
 </details>
 </dd>
+<dt id="calib3d.calib.Calib.rot90"><code class="name flex">
+<span>def <span class="ident">rot90</span></span>(<span>self, k) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a calib corresponding to a camera that was rotated <code>k</code> times around it's main axis.
+k (int) : Number of times the array is rotated by 90 degrees.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rot90(self, k) -&gt; &#39;Calib&#39;:
+    &#34;&#34;&#34; Returns a calib corresponding to a camera that was rotated `k` times around it&#39;s main axis.
+        k (int) : Number of times the array is rotated by 90 degrees.
+    &#34;&#34;&#34;
+    raise NotImplementedError(&#34;Method not tested&#34;)
+    R = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])**k
+    transpose = k % 2
+    return self.update(K=R@self.K, width=self.height if transpose else self.width, height=self.width if transpose else self.height)</code></pre>
+</details>
+</dd>
 <dt id="calib3d.calib.Calib.rotate"><code class="name flex">
 <span>def <span class="ident">rotate</span></span>(<span>self, angle) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
 </code></dt>
@@ -1365,7 +1439,7 @@ Returns <code>True</code> where for points that projects in the image and <code>
 </details>
 </dd>
 <dt id="calib3d.calib.Calib.scale"><code class="name flex">
-<span>def <span class="ident">scale</span></span>(<span>self, output_width, output_height) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
+<span>def <span class="ident">scale</span></span>(<span>self, output_width=None, output_height=None, sx=None, sy=None) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1373,11 +1447,13 @@ Returns <code>True</code> where for points that projects in the image and <code>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def scale(self, output_width, output_height) -&gt; &#39;Calib&#39;:
-    sx = output_width/self.width
-    sy = output_height/self.height
+<pre><code class="python">def scale(self, output_width=None, output_height=None, sx=None, sy=None) -&gt; &#39;Calib&#39;:
+    sx = sx or output_width/self.width
+    sy = sy or output_height/self.height
+    width = output_width or int(self.width*sx)
+    height = output_height or int(self.height*sy)
     S = np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])
-    return self.update(width=output_width, height=output_height, K=S@self.K)</code></pre>
+    return self.update(width=width, height=height, K=S@self.K)</code></pre>
 </details>
 </dd>
 <dt id="calib3d.calib.Calib.update"><code class="name flex">
@@ -1454,11 +1530,13 @@ Returns <code>True</code> where for points that projects in the image and <code>
 <li><code><a title="calib3d.calib.Calib.dump" href="#calib3d.calib.Calib.dump">dump</a></code></li>
 <li><code><a title="calib3d.calib.Calib.flip" href="#calib3d.calib.Calib.flip">flip</a></code></li>
 <li><code><a title="calib3d.calib.Calib.from_P" href="#calib3d.calib.Calib.from_P">from_P</a></code></li>
+<li><code><a title="calib3d.calib.Calib.is_behind" href="#calib3d.calib.Calib.is_behind">is_behind</a></code></li>
 <li><code><a title="calib3d.calib.Calib.load" href="#calib3d.calib.Calib.load">load</a></code></li>
 <li><code><a title="calib3d.calib.Calib.project_2D_to_3D" href="#calib3d.calib.Calib.project_2D_to_3D">project_2D_to_3D</a></code></li>
 <li><code><a title="calib3d.calib.Calib.project_3D_to_2D" href="#calib3d.calib.Calib.project_3D_to_2D">project_3D_to_2D</a></code></li>
 <li><code><a title="calib3d.calib.Calib.projects_in" href="#calib3d.calib.Calib.projects_in">projects_in</a></code></li>
 <li><code><a title="calib3d.calib.Calib.rectify" href="#calib3d.calib.Calib.rectify">rectify</a></code></li>
+<li><code><a title="calib3d.calib.Calib.rot90" href="#calib3d.calib.Calib.rot90">rot90</a></code></li>
 <li><code><a title="calib3d.calib.Calib.rotate" href="#calib3d.calib.Calib.rotate">rotate</a></code></li>
 <li><code><a title="calib3d.calib.Calib.scale" href="#calib3d.calib.Calib.scale">scale</a></code></li>
 <li><code><a title="calib3d.calib.Calib.update" href="#calib3d.calib.Calib.update">update</a></code></li>
