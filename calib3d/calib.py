@@ -354,8 +354,17 @@ class Calib():
             Returns `True` where for points that projects in the image and `False` otherwise.
         """
         point2D = self.project_3D_to_2D(point3D)
-        cond = np.stack((point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width, point2D.y <= self.height))
+        cond = np.stack((point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width-1, point2D.y <= self.height-1))
         return np.all(cond, axis=0)
+
+    def dist_to_border(self, point3D: Point3D) -> np.ndarray:
+        """ Returns the distance to `Calib` object's borders in both dimensions,
+            For each point given in point3D
+        """
+        point2D = self.project_3D_to_2D(point3D)
+        distx = np.min(np.stack((self.width - point2D.x, point2D.x)), axis=0)
+        disty = np.min(np.stack((self.height - point2D.y, point2D.y)), axis=0)
+        return distx, disty
 
     def is_behind(self, point3D: Point3D) -> np.ndarray:
         n = Point3D(0,0,1) # normal to the camera plane in camera 3D coordinates system
