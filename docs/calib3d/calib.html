@@ -503,8 +503,17 @@ class Calib():
             Returns `True` where for points that projects in the image and `False` otherwise.
         &#34;&#34;&#34;
         point2D = self.project_3D_to_2D(point3D)
-        cond = np.stack((point2D.x &gt;= 0, point2D.y &gt;= 0, point2D.x &lt;= self.width, point2D.y &lt;= self.height))
+        cond = np.stack((point2D.x &gt;= 0, point2D.y &gt;= 0, point2D.x &lt;= self.width-1, point2D.y &lt;= self.height-1))
         return np.all(cond, axis=0)
+
+    def dist_to_border(self, point3D: Point3D) -&gt; np.ndarray:
+        &#34;&#34;&#34; Returns the distance to `Calib` object&#39;s borders in both dimensions,
+            For each point given in point3D
+        &#34;&#34;&#34;
+        point2D = self.project_3D_to_2D(point3D)
+        distx = np.min(np.stack((self.width - point2D.x, point2D.x)), axis=0)
+        disty = np.min(np.stack((self.height - point2D.y, point2D.y)), axis=0)
+        return distx, disty
 
     def is_behind(self, point3D: Point3D) -&gt; np.ndarray:
         n = Point3D(0,0,1) # normal to the camera plane in camera 3D coordinates system
@@ -1053,8 +1062,17 @@ The returned image will be large enough to hold the entire new image, with a bla
             Returns `True` where for points that projects in the image and `False` otherwise.
         &#34;&#34;&#34;
         point2D = self.project_3D_to_2D(point3D)
-        cond = np.stack((point2D.x &gt;= 0, point2D.y &gt;= 0, point2D.x &lt;= self.width, point2D.y &lt;= self.height))
+        cond = np.stack((point2D.x &gt;= 0, point2D.y &gt;= 0, point2D.x &lt;= self.width-1, point2D.y &lt;= self.height-1))
         return np.all(cond, axis=0)
+
+    def dist_to_border(self, point3D: Point3D) -&gt; np.ndarray:
+        &#34;&#34;&#34; Returns the distance to `Calib` object&#39;s borders in both dimensions,
+            For each point given in point3D
+        &#34;&#34;&#34;
+        point2D = self.project_3D_to_2D(point3D)
+        distx = np.min(np.stack((self.width - point2D.x, point2D.x)), axis=0)
+        disty = np.min(np.stack((self.height - point2D.y, point2D.y)), axis=0)
+        return distx, disty
 
     def is_behind(self, point3D: Point3D) -&gt; np.ndarray:
         n = Point3D(0,0,1) # normal to the camera plane in camera 3D coordinates system
@@ -1189,6 +1207,26 @@ def dict(self) -&gt; dict:
     height = y_slice.stop - y_slice.start
     T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
     return self.update(width=width, height=height, K=T@self.K)</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.Calib.dist_to_border"><code class="name flex">
+<span>def <span class="ident">dist_to_border</span></span>(<span>self, point3D: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the distance to <code><a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></code> object's borders in both dimensions,
+For each point given in point3D</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dist_to_border(self, point3D: Point3D) -&gt; np.ndarray:
+    &#34;&#34;&#34; Returns the distance to `Calib` object&#39;s borders in both dimensions,
+        For each point given in point3D
+    &#34;&#34;&#34;
+    point2D = self.project_3D_to_2D(point3D)
+    distx = np.min(np.stack((self.width - point2D.x, point2D.x)), axis=0)
+    disty = np.min(np.stack((self.height - point2D.y, point2D.y)), axis=0)
+    return distx, disty</code></pre>
 </details>
 </dd>
 <dt id="calib3d.calib.Calib.distort"><code class="name flex">
@@ -1370,7 +1408,7 @@ Returns <code>True</code> where for points that projects in the image and <code>
         Returns `True` where for points that projects in the image and `False` otherwise.
     &#34;&#34;&#34;
     point2D = self.project_3D_to_2D(point3D)
-    cond = np.stack((point2D.x &gt;= 0, point2D.y &gt;= 0, point2D.x &lt;= self.width, point2D.y &lt;= self.height))
+    cond = np.stack((point2D.x &gt;= 0, point2D.y &gt;= 0, point2D.x &lt;= self.width-1, point2D.y &lt;= self.height-1))
     return np.all(cond, axis=0)</code></pre>
 </details>
 </dd>
@@ -1526,6 +1564,7 @@ k (int) : Number of times the array is rotated by 90 degrees.</p></div>
 <li><code><a title="calib3d.calib.Calib.compute_length2D" href="#calib3d.calib.Calib.compute_length2D">compute_length2D</a></code></li>
 <li><code><a title="calib3d.calib.Calib.crop" href="#calib3d.calib.Calib.crop">crop</a></code></li>
 <li><code><a title="calib3d.calib.Calib.dict" href="#calib3d.calib.Calib.dict">dict</a></code></li>
+<li><code><a title="calib3d.calib.Calib.dist_to_border" href="#calib3d.calib.Calib.dist_to_border">dist_to_border</a></code></li>
 <li><code><a title="calib3d.calib.Calib.distort" href="#calib3d.calib.Calib.distort">distort</a></code></li>
 <li><code><a title="calib3d.calib.Calib.dump" href="#calib3d.calib.Calib.dump">dump</a></code></li>
 <li><code><a title="calib3d.calib.Calib.flip" href="#calib3d.calib.Calib.flip">flip</a></code></li>
