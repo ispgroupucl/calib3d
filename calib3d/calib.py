@@ -304,7 +304,7 @@ class Calib():
             point2D = Point2D(self.K @ point2D.H) # to pixel coordinates
         return point2D
 
-    def crop(self, x_slice, y_slice) -> 'Calib':
+    def crop(self, x_slice: slice, y_slice: slice) -> 'Calib':
         x0 = x_slice.start
         y0 = y_slice.start
         width = x_slice.stop - x_slice.start
@@ -312,7 +312,11 @@ class Calib():
         T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
         return self.update(width=width, height=height, K=T@self.K)
 
-    def scale(self, output_width=None, output_height=None, sx=None, sy=None) -> 'Calib':
+    def scale(self, output_width: int=None, output_height: int=None, sx: float=None, sy: float=None) -> 'Calib':
+        """ Returns a calib corresponding to a camera that was scaled by horizontal and vertical scale
+            factors `sx` and `sy`. If `sx` and `sy` are not given, the scale factors are computed with the current
+            width and height and the given `output_width` and `output_height`.
+        """
         sx = sx or output_width/self.width
         sy = sy or output_height/self.height
         width = output_width or int(self.width*sx)
@@ -321,10 +325,15 @@ class Calib():
         return self.update(width=width, height=height, K=S@self.K)
 
     def flip(self) -> 'Calib':
+        """ Returns a calib corresponding to a camera that was flipped horizontally.
+        """
         F = np.array([[-1, 0, self.width-1], [0, 1, 0], [0, 0, 1]])
         return self.update(K=F@self.K)
 
     def rotate(self, angle) -> 'Calib':
+        """ Returns a calib corresponding to a camera that was rotated by `angle` degrees.
+            angle (float) : Angle of rotation in degrees.
+        """
         if angle == 0:
             return self
         A, new_width, new_height = compute_rotate(self.width, self.height, angle, degrees=True)
@@ -333,14 +342,18 @@ class Calib():
     def rot90(self, k) -> 'Calib':
         """ Returns a calib corresponding to a camera that was rotated `k` times around it's main axis.
             k (int) : Number of times the array is rotated by 90 degrees.
+
+            .. todo:: This method should be tested.
         """
         raise NotImplementedError("Method not tested")
         R = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])**k
         transpose = k % 2
         return self.update(K=R@self.K, width=self.height if transpose else self.width, height=self.width if transpose else self.height)
 
-    def compute_length2D(self, length3D: float, point3D: Point3D) -> np.ndarray:
+    def compute_length2D(self: float, point3D: Point3D, length3D) -> np.ndarray:
         """ Returns the length in pixel of a 3D length at point3D
+
+            .. versionchanged:: 2.8.0: `length3D` and `point3D` were interverted.
         """
         assert np.isscalar(length3D), f"This function expects a scalar `length3D` argument. Received {length3D}"
         point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
@@ -367,12 +380,15 @@ class Calib():
         return distx, disty
 
     def is_behind(self, point3D: Point3D) -> np.ndarray:
+        """ Returns `True` where for points that are behind the camera and `False` otherwise.
+        """
         n = Point3D(0,0,1) # normal to the camera plane in camera 3D coordinates system
         point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # point3D expressed in camera 3D coordinates system
         return np.asarray((n.T @ point3D_c)[0] < 0)
 
     def __str__(self):
         return f"Calib object ({self.width}×{self.height})@({self.C.x: 1.6g},{self.C.y: 1.6g},{self.C.z: 1.6g})"
+
 
 
 def line_plane_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:

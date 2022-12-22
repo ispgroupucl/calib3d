@@ -453,7 +453,7 @@ class Calib():
             point2D = Point2D(self.K @ point2D.H) # to pixel coordinates
         return point2D
 
-    def crop(self, x_slice, y_slice) -&gt; &#39;Calib&#39;:
+    def crop(self, x_slice: slice, y_slice: slice) -&gt; &#39;Calib&#39;:
         x0 = x_slice.start
         y0 = y_slice.start
         width = x_slice.stop - x_slice.start
@@ -461,7 +461,11 @@ class Calib():
         T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
         return self.update(width=width, height=height, K=T@self.K)
 
-    def scale(self, output_width=None, output_height=None, sx=None, sy=None) -&gt; &#39;Calib&#39;:
+    def scale(self, output_width: int=None, output_height: int=None, sx: float=None, sy: float=None) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Returns a calib corresponding to a camera that was scaled by horizontal and vertical scale
+            factors `sx` and `sy`. If `sx` and `sy` are not given, the scale factors are computed with the current
+            width and height and the given `output_width` and `output_height`.
+        &#34;&#34;&#34;
         sx = sx or output_width/self.width
         sy = sy or output_height/self.height
         width = output_width or int(self.width*sx)
@@ -470,10 +474,15 @@ class Calib():
         return self.update(width=width, height=height, K=S@self.K)
 
     def flip(self) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Returns a calib corresponding to a camera that was flipped horizontally.
+        &#34;&#34;&#34;
         F = np.array([[-1, 0, self.width-1], [0, 1, 0], [0, 0, 1]])
         return self.update(K=F@self.K)
 
     def rotate(self, angle) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Returns a calib corresponding to a camera that was rotated by `angle` degrees.
+            angle (float) : Angle of rotation in degrees.
+        &#34;&#34;&#34;
         if angle == 0:
             return self
         A, new_width, new_height = compute_rotate(self.width, self.height, angle, degrees=True)
@@ -482,14 +491,18 @@ class Calib():
     def rot90(self, k) -&gt; &#39;Calib&#39;:
         &#34;&#34;&#34; Returns a calib corresponding to a camera that was rotated `k` times around it&#39;s main axis.
             k (int) : Number of times the array is rotated by 90 degrees.
+
+            .. todo:: This method should be tested.
         &#34;&#34;&#34;
         raise NotImplementedError(&#34;Method not tested&#34;)
         R = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])**k
         transpose = k % 2
         return self.update(K=R@self.K, width=self.height if transpose else self.width, height=self.width if transpose else self.height)
 
-    def compute_length2D(self, length3D: float, point3D: Point3D) -&gt; np.ndarray:
+    def compute_length2D(self: float, point3D: Point3D, length3D) -&gt; np.ndarray:
         &#34;&#34;&#34; Returns the length in pixel of a 3D length at point3D
+
+            .. versionchanged:: 2.8.0: `length3D` and `point3D` were interverted.
         &#34;&#34;&#34;
         assert np.isscalar(length3D), f&#34;This function expects a scalar `length3D` argument. Received {length3D}&#34;
         point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
@@ -516,12 +529,15 @@ class Calib():
         return distx, disty
 
     def is_behind(self, point3D: Point3D) -&gt; np.ndarray:
+        &#34;&#34;&#34; Returns `True` where for points that are behind the camera and `False` otherwise.
+        &#34;&#34;&#34;
         n = Point3D(0,0,1) # normal to the camera plane in camera 3D coordinates system
         point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # point3D expressed in camera 3D coordinates system
         return np.asarray((n.T @ point3D_c)[0] &lt; 0)
 
     def __str__(self):
         return f&#34;Calib object ({self.width}×{self.height})@({self.C.x: 1.6g},{self.C.y: 1.6g},{self.C.z: 1.6g})&#34;
+
 
 
 def line_plane_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
@@ -1012,7 +1028,7 @@ The returned image will be large enough to hold the entire new image, with a bla
             point2D = Point2D(self.K @ point2D.H) # to pixel coordinates
         return point2D
 
-    def crop(self, x_slice, y_slice) -&gt; &#39;Calib&#39;:
+    def crop(self, x_slice: slice, y_slice: slice) -&gt; &#39;Calib&#39;:
         x0 = x_slice.start
         y0 = y_slice.start
         width = x_slice.stop - x_slice.start
@@ -1020,7 +1036,11 @@ The returned image will be large enough to hold the entire new image, with a bla
         T = np.array([[1, 0,-x0], [0, 1,-y0], [0, 0, 1]])
         return self.update(width=width, height=height, K=T@self.K)
 
-    def scale(self, output_width=None, output_height=None, sx=None, sy=None) -&gt; &#39;Calib&#39;:
+    def scale(self, output_width: int=None, output_height: int=None, sx: float=None, sy: float=None) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Returns a calib corresponding to a camera that was scaled by horizontal and vertical scale
+            factors `sx` and `sy`. If `sx` and `sy` are not given, the scale factors are computed with the current
+            width and height and the given `output_width` and `output_height`.
+        &#34;&#34;&#34;
         sx = sx or output_width/self.width
         sy = sy or output_height/self.height
         width = output_width or int(self.width*sx)
@@ -1029,10 +1049,15 @@ The returned image will be large enough to hold the entire new image, with a bla
         return self.update(width=width, height=height, K=S@self.K)
 
     def flip(self) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Returns a calib corresponding to a camera that was flipped horizontally.
+        &#34;&#34;&#34;
         F = np.array([[-1, 0, self.width-1], [0, 1, 0], [0, 0, 1]])
         return self.update(K=F@self.K)
 
     def rotate(self, angle) -&gt; &#39;Calib&#39;:
+        &#34;&#34;&#34; Returns a calib corresponding to a camera that was rotated by `angle` degrees.
+            angle (float) : Angle of rotation in degrees.
+        &#34;&#34;&#34;
         if angle == 0:
             return self
         A, new_width, new_height = compute_rotate(self.width, self.height, angle, degrees=True)
@@ -1041,14 +1066,18 @@ The returned image will be large enough to hold the entire new image, with a bla
     def rot90(self, k) -&gt; &#39;Calib&#39;:
         &#34;&#34;&#34; Returns a calib corresponding to a camera that was rotated `k` times around it&#39;s main axis.
             k (int) : Number of times the array is rotated by 90 degrees.
+
+            .. todo:: This method should be tested.
         &#34;&#34;&#34;
         raise NotImplementedError(&#34;Method not tested&#34;)
         R = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])**k
         transpose = k % 2
         return self.update(K=R@self.K, width=self.height if transpose else self.width, height=self.width if transpose else self.height)
 
-    def compute_length2D(self, length3D: float, point3D: Point3D) -&gt; np.ndarray:
+    def compute_length2D(self: float, point3D: Point3D, length3D) -&gt; np.ndarray:
         &#34;&#34;&#34; Returns the length in pixel of a 3D length at point3D
+
+            .. versionchanged:: 2.8.0: `length3D` and `point3D` were interverted.
         &#34;&#34;&#34;
         assert np.isscalar(length3D), f&#34;This function expects a scalar `length3D` argument. Received {length3D}&#34;
         point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
@@ -1075,6 +1104,8 @@ The returned image will be large enough to hold the entire new image, with a bla
         return distx, disty
 
     def is_behind(self, point3D: Point3D) -&gt; np.ndarray:
+        &#34;&#34;&#34; Returns `True` where for points that are behind the camera and `False` otherwise.
+        &#34;&#34;&#34;
         n = Point3D(0,0,1) # normal to the camera plane in camera 3D coordinates system
         point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # point3D expressed in camera 3D coordinates system
         return np.asarray((n.T @ point3D_c)[0] &lt; 0)
@@ -1172,16 +1203,21 @@ def dict(self) -&gt; dict:
 <h3>Methods</h3>
 <dl>
 <dt id="calib3d.calib.Calib.compute_length2D"><code class="name flex">
-<span>def <span class="ident">compute_length2D</span></span>(<span>self, length3D: float, point3D: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>) ‑> numpy.ndarray</span>
+<span>def <span class="ident">compute_length2D</span></span>(<span>self: float, point3D: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>, length3D) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Returns the length in pixel of a 3D length at point3D</p></div>
+<div class="desc"><p>Returns the length in pixel of a 3D length at point3D</p>
+<div class="admonition versionchanged">
+<p class="admonition-title">Changed in version:&ensp;2.8.0: <code>length3D</code> and <code>point3D</code> were interverted.</p>
+</div></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def compute_length2D(self, length3D: float, point3D: Point3D) -&gt; np.ndarray:
+<pre><code class="python">def compute_length2D(self: float, point3D: Point3D, length3D) -&gt; np.ndarray:
     &#34;&#34;&#34; Returns the length in pixel of a 3D length at point3D
+
+        .. versionchanged:: 2.8.0: `length3D` and `point3D` were interverted.
     &#34;&#34;&#34;
     assert np.isscalar(length3D), f&#34;This function expects a scalar `length3D` argument. Received {length3D}&#34;
     point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
@@ -1192,7 +1228,7 @@ def dict(self) -&gt; dict:
 </details>
 </dd>
 <dt id="calib3d.calib.Calib.crop"><code class="name flex">
-<span>def <span class="ident">crop</span></span>(<span>self, x_slice, y_slice) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
+<span>def <span class="ident">crop</span></span>(<span>self, x_slice: slice, y_slice: slice) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1200,7 +1236,7 @@ def dict(self) -&gt; dict:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def crop(self, x_slice, y_slice) -&gt; &#39;Calib&#39;:
+<pre><code class="python">def crop(self, x_slice: slice, y_slice: slice) -&gt; &#39;Calib&#39;:
     x0 = x_slice.start
     y0 = y_slice.start
     width = x_slice.stop - x_slice.start
@@ -1286,12 +1322,14 @@ For each point given in point3D</p></div>
 <span>def <span class="ident">flip</span></span>(<span>self) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a calib corresponding to a camera that was flipped horizontally.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def flip(self) -&gt; &#39;Calib&#39;:
+    &#34;&#34;&#34; Returns a calib corresponding to a camera that was flipped horizontally.
+    &#34;&#34;&#34;
     F = np.array([[-1, 0, self.width-1], [0, 1, 0], [0, 0, 1]])
     return self.update(K=F@self.K)</code></pre>
 </details>
@@ -1300,12 +1338,14 @@ For each point given in point3D</p></div>
 <span>def <span class="ident">is_behind</span></span>(<span>self, point3D: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns <code>True</code> where for points that are behind the camera and <code>False</code> otherwise.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_behind(self, point3D: Point3D) -&gt; np.ndarray:
+    &#34;&#34;&#34; Returns `True` where for points that are behind the camera and `False` otherwise.
+    &#34;&#34;&#34;
     n = Point3D(0,0,1) # normal to the camera plane in camera 3D coordinates system
     point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # point3D expressed in camera 3D coordinates system
     return np.asarray((n.T @ point3D_c)[0] &lt; 0)</code></pre>
@@ -1445,7 +1485,11 @@ Returns <code>True</code> where for points that projects in the image and <code>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a calib corresponding to a camera that was rotated <code>k</code> times around it's main axis.
-k (int) : Number of times the array is rotated by 90 degrees.</p></div>
+k (int) : Number of times the array is rotated by 90 degrees.</p>
+<div class="admonition todo">
+<p class="admonition-title">TODO</p>
+<p>This method should be tested.</p>
+</div></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1453,6 +1497,8 @@ k (int) : Number of times the array is rotated by 90 degrees.</p></div>
 <pre><code class="python">def rot90(self, k) -&gt; &#39;Calib&#39;:
     &#34;&#34;&#34; Returns a calib corresponding to a camera that was rotated `k` times around it&#39;s main axis.
         k (int) : Number of times the array is rotated by 90 degrees.
+
+        .. todo:: This method should be tested.
     &#34;&#34;&#34;
     raise NotImplementedError(&#34;Method not tested&#34;)
     R = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])**k
@@ -1464,12 +1510,16 @@ k (int) : Number of times the array is rotated by 90 degrees.</p></div>
 <span>def <span class="ident">rotate</span></span>(<span>self, angle) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a calib corresponding to a camera that was rotated by <code>angle</code> degrees.
+angle (float) : Angle of rotation in degrees.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def rotate(self, angle) -&gt; &#39;Calib&#39;:
+    &#34;&#34;&#34; Returns a calib corresponding to a camera that was rotated by `angle` degrees.
+        angle (float) : Angle of rotation in degrees.
+    &#34;&#34;&#34;
     if angle == 0:
         return self
     A, new_width, new_height = compute_rotate(self.width, self.height, angle, degrees=True)
@@ -1477,15 +1527,21 @@ k (int) : Number of times the array is rotated by 90 degrees.</p></div>
 </details>
 </dd>
 <dt id="calib3d.calib.Calib.scale"><code class="name flex">
-<span>def <span class="ident">scale</span></span>(<span>self, output_width=None, output_height=None, sx=None, sy=None) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
+<span>def <span class="ident">scale</span></span>(<span>self, output_width: int = None, output_height: int = None, sx: float = None, sy: float = None) ‑> <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Returns a calib corresponding to a camera that was scaled by horizontal and vertical scale
+factors <code>sx</code> and <code>sy</code>. If <code>sx</code> and <code>sy</code> are not given, the scale factors are computed with the current
+width and height and the given <code>output_width</code> and <code>output_height</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def scale(self, output_width=None, output_height=None, sx=None, sy=None) -&gt; &#39;Calib&#39;:
+<pre><code class="python">def scale(self, output_width: int=None, output_height: int=None, sx: float=None, sy: float=None) -&gt; &#39;Calib&#39;:
+    &#34;&#34;&#34; Returns a calib corresponding to a camera that was scaled by horizontal and vertical scale
+        factors `sx` and `sy`. If `sx` and `sy` are not given, the scale factors are computed with the current
+        width and height and the given `output_width` and `output_height`.
+    &#34;&#34;&#34;
     sx = sx or output_width/self.width
     sy = sy or output_height/self.height
     width = output_width or int(self.width*sx)
