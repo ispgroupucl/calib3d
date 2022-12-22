@@ -350,7 +350,7 @@ class Calib():
         transpose = k % 2
         return self.update(K=R@self.K, width=self.height if transpose else self.width, height=self.width if transpose else self.height)
 
-    def compute_length2D(self: float, point3D: Point3D, length3D) -> np.ndarray:
+    def compute_length2D(self, point3D: Point3D, length3D: float) -> np.ndarray:
         """ Returns the length in pixel of a 3D length at point3D
 
             .. versionchanged:: 2.8.0: `length3D` and `point3D` were interverted.
