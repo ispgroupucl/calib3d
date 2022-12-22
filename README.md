@@ -1,6 +1,6 @@
 # Python camera calibration and projective geometry library
 
-This library offers several tools for manipulation of calibrated cameras, projective geometry and computations using homogenous coordinates. 
+This library offers several tools for manipulation of calibrated cameras, projective geometry and computations using homogenous coordinates.
 
 Camera calibration allows to determine the relation between the camera's pixels (2D coordinates) and points in the real world
 (3D coordinates). It implies computation using homogenous coordinates. This python library aims at simplifying implementations
@@ -72,7 +72,7 @@ Other useful methods
 >>> calib.projects_in(Point3D(0, 20, 20))
 False
 
->>> calib.compute_length2D(.42, Point3D(0, 0, 0))  # Number of pixels that represent a length of .42 in the 3D space
+>>> calib.compute_length2D(Point3D(0, 0, 0), .42)  # Number of pixels that represent a length of .42 in the 3D space
 array([339.48195828])
 ```
 

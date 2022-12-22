@@ -499,7 +499,7 @@ class Calib():
         transpose = k % 2
         return self.update(K=R@self.K, width=self.height if transpose else self.width, height=self.width if transpose else self.height)
 
-    def compute_length2D(self: float, point3D: Point3D, length3D) -&gt; np.ndarray:
+    def compute_length2D(self, point3D: Point3D, length3D: float) -&gt; np.ndarray:
         &#34;&#34;&#34; Returns the length in pixel of a 3D length at point3D
 
             .. versionchanged:: 2.8.0: `length3D` and `point3D` were interverted.
@@ -1074,7 +1074,7 @@ The returned image will be large enough to hold the entire new image, with a bla
         transpose = k % 2
         return self.update(K=R@self.K, width=self.height if transpose else self.width, height=self.width if transpose else self.height)
 
-    def compute_length2D(self: float, point3D: Point3D, length3D) -&gt; np.ndarray:
+    def compute_length2D(self, point3D: Point3D, length3D: float) -&gt; np.ndarray:
         &#34;&#34;&#34; Returns the length in pixel of a 3D length at point3D
 
             .. versionchanged:: 2.8.0: `length3D` and `point3D` were interverted.
@@ -1203,7 +1203,7 @@ def dict(self) -&gt; dict:
 <h3>Methods</h3>
 <dl>
 <dt id="calib3d.calib.Calib.compute_length2D"><code class="name flex">
-<span>def <span class="ident">compute_length2D</span></span>(<span>self: float, point3D: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>, length3D) ‑> numpy.ndarray</span>
+<span>def <span class="ident">compute_length2D</span></span>(<span>self, point3D: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>, length3D: float) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns the length in pixel of a 3D length at point3D</p>
@@ -1214,7 +1214,7 @@ def dict(self) -&gt; dict:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def compute_length2D(self: float, point3D: Point3D, length3D) -&gt; np.ndarray:
+<pre><code class="python">def compute_length2D(self, point3D: Point3D, length3D: float) -&gt; np.ndarray:
     &#34;&#34;&#34; Returns the length in pixel of a 3D length at point3D
 
         .. versionchanged:: 2.8.0: `length3D` and `point3D` were interverted.
