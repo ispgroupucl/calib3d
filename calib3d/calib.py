@@ -266,6 +266,26 @@ class Calib():
         v = np.array([[0 if x is None else 1 for x in v]]).T
         return line_plane_intersection(self.C, d, P, v)
 
+    def project_2D_to_3D_plane(self, point2D: Point2D, point3D: Point3D, n) -> Point3D:
+        """ Using the calib object, project a 2D point in the 3D image space
+            given the normal vector and point of a 3D plane with which
+            it intersects.
+            Args:
+                point2D (Point2D): the 2D point to be projected
+                point3D (Point3D): a Point3D on the plane
+                n (np.ndarray): the normal vector of the plane
+            Returns:
+                The point in the 3D world that projects on `point2D` and for
+                which the given coordinates is given.
+        """
+        assert isinstance(point2D, Point2D), "Wrong argument type '{}'. Expected {}".format(type(point2D), Point2D)
+        assert isinstance(point3D, Point3D), "Wrong argument type '{}'. Expected {}".format(type(point3D), Point3D)
+
+        point2D = self.rectify(point2D)
+        X = Point3D(self.Pinv @ point2D.H)
+        d = (X - self.C)
+        return line_plane_intersection(self.C, d, point3D, n)
+
     def distort(self, point2D: Point2D) -> Point2D:
         """ Applies lens distortions to the given `point2D`.
         """
