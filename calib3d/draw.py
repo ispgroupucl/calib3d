@@ -48,7 +48,7 @@ class ProjectiveDrawer():
                 canvas.plot(points.x, points.y, linewidth=thickness, color=np.array(color)/255, markersize=markersize, **kwargs)
 
     def polylines(self, canvas, points3D: Point3D, color=None, thickness: int=None, **kwargs):
-        self._polylines(canvas, self.calib.project_3D_to_2D(points3D), thickness=thickness, **kwargs)
+        self._polylines(canvas, self.calib.project_3D_to_2D(points3D), color=color, thickness=thickness, **kwargs)
         #for point3D1, point3D2 in zip(points3D, points3D.close()[:,1:]):
         #    self.draw_line(canvas, point3D1, point3D2, *args, **kwargs)
 
