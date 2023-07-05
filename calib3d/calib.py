@@ -362,6 +362,20 @@ class Calib():
         length = np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=0)
         return length#float(length) if point3D.shape[1] == 1 else length
 
+    def compute_length3D(self, point3D: Point3D, length2D: float) -> np.ndarray:
+        """ Returns the (maximum) distance of the 3D point located `length2D` pixels away from `point3D` in the image plane.
+        """
+        assert np.isscalar(length2D), f"This function expects a scalar `length2D` argument. Received {length2D}"
+        point2D_shifted = self.project_3D_to_2D(point3D)
+        point2D_shifted.x += length2D
+        point2D_shifted = self.rectify(point2D_shifted)
+        point3D_shifted_c = Point3D(self.Kinv @ point2D_shifted.H)
+        point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
+        point3D_shifted_c = point3D_shifted_c*point3D_c.z/point3D_shifted_c.z
+        length = np.linalg.norm(point3D_shifted_c - point3D_c, axis=0)
+        return length
+
+
     def projects_in(self, point3D: Point3D) -> np.ndarray:
         """ Check wether point3D projects into the `Calib` object.
             Returns `True` where for points that projects in the image and `False` otherwise.
