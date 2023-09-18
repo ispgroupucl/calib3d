@@ -506,7 +506,9 @@ class Calib():
         &#34;&#34;&#34;
         assert np.isscalar(length3D), f&#34;This function expects a scalar `length3D` argument. Received {length3D}&#34;
         point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
-        point3D_c.x += length3D # add the 3D length to one of the componant
+        orth = np.dot(point3D_c.flatten(), Point3D(point3D_c.x, point3D_c.y, 0).flatten())
+        orth = orth *length3D / np.linalg.norm(orth)
+        point3D_c.y += orth # add the 3D length orthogonally to the point in camera coordinates
         point2D = self.distort(Point2D(self.K @ point3D_c)) # go in the 2D world
         length = np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=0)
         return length#float(length) if point3D.shape[1] == 1 else length
@@ -1095,7 +1097,9 @@ The returned image will be large enough to hold the entire new image, with a bla
         &#34;&#34;&#34;
         assert np.isscalar(length3D), f&#34;This function expects a scalar `length3D` argument. Received {length3D}&#34;
         point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
-        point3D_c.x += length3D # add the 3D length to one of the componant
+        orth = np.dot(point3D_c.flatten(), Point3D(point3D_c.x, point3D_c.y, 0).flatten())
+        orth = orth *length3D / np.linalg.norm(orth)
+        point3D_c.y += orth # add the 3D length orthogonally to the point in camera coordinates
         point2D = self.distort(Point2D(self.K @ point3D_c)) # go in the 2D world
         length = np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=0)
         return length#float(length) if point3D.shape[1] == 1 else length
@@ -1249,7 +1253,9 @@ def dict(self) -&gt; dict:
     &#34;&#34;&#34;
     assert np.isscalar(length3D), f&#34;This function expects a scalar `length3D` argument. Received {length3D}&#34;
     point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
-    point3D_c.x += length3D # add the 3D length to one of the componant
+    orth = np.dot(point3D_c.flatten(), Point3D(point3D_c.x, point3D_c.y, 0).flatten())
+    orth = orth *length3D / np.linalg.norm(orth)
+    point3D_c.y += orth # add the 3D length orthogonally to the point in camera coordinates
     point2D = self.distort(Point2D(self.K @ point3D_c)) # go in the 2D world
     length = np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=0)
     return length#float(length) if point3D.shape[1] == 1 else length</code></pre>
