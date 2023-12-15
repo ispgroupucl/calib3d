@@ -134,10 +134,15 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
     # def D(self):
     #     &#34;&#34;&#34; Returns the number of spacial dimensions &#34;&#34;&#34;
     #     return len(self._coord_names)
+
     # /!\ a different getitem gives too much trouble with all numpy operator
     #def __getitem__(self, i):
+    #    return self.__class__(super().__getitem__((slice(None), i)))
     #    if isinstance(i, int):
-    #        return self.__class__(super().__getitem__((slice(None), i)))
+    #        #b, j = i
+    #        j = i
+    #        #if b is Ellipsis and isinstance(j, int):
+    #        return super().__getitem__((slice(None), slice(j,j+1,None)))
     #    return super().__getitem__(i)
 
     # /!\ iter may conflict with numpy array getitem.
@@ -189,6 +194,9 @@ class HomogeneousCoordinatesPoint(np.ndarray, metaclass=ABCMeta):
     _get_coord = lambda self, i:        np.asarray(super().__getitem__((i,0)))       if self.shape[1] == 1 else np.asarray(super().__getitem__(i))
     _set_coord = lambda self, i, value:            super().__setitem__((i,0), value) if self.shape[1] == 1 else            super().__setitem__((i), value)
 
+
+class Point(HomogeneousCoordinatesPoint):
+    pass # easier type
 
 class Point2D(HomogeneousCoordinatesPoint):
     &#34;&#34;&#34; Numpy representation of a single 2D point or a list of 2D points
@@ -332,10 +340,15 @@ Point2D([[1.],
     # def D(self):
     #     &#34;&#34;&#34; Returns the number of spacial dimensions &#34;&#34;&#34;
     #     return len(self._coord_names)
+
     # /!\ a different getitem gives too much trouble with all numpy operator
     #def __getitem__(self, i):
+    #    return self.__class__(super().__getitem__((slice(None), i)))
     #    if isinstance(i, int):
-    #        return self.__class__(super().__getitem__((slice(None), i)))
+    #        #b, j = i
+    #        j = i
+    #        #if b is Ellipsis and isinstance(j, int):
+    #        return super().__getitem__((slice(None), slice(j,j+1,None)))
     #    return super().__getitem__(i)
 
     # /!\ iter may conflict with numpy array getitem.
@@ -393,6 +406,7 @@ Point2D([[1.],
 </ul>
 <h3>Subclasses</h3>
 <ul class="hlist">
+<li><a title="calib3d.points.Point" href="#calib3d.points.Point">Point</a></li>
 <li><a title="calib3d.points.Point2D" href="#calib3d.points.Point2D">Point2D</a></li>
 <li><a title="calib3d.points.Point3D" href="#calib3d.points.Point3D">Point3D</a></li>
 </ul>
@@ -569,6 +583,52 @@ hence "closing" the polygon defined by the initial points.</p>
 </details>
 </dd>
 </dl>
+</dd>
+<dt id="calib3d.points.Point"><code class="flex name class">
+<span>class <span class="ident">Point</span></span>
+<span>(</span><span>*coords)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extension of Numpy <code>np.ndarray</code> that implements generic homogenous coordinates points
+for <code><a title="calib3d.points.Point2D" href="#calib3d.points.Point2D">Point2D</a></code> and <code><a title="calib3d.points.Point3D" href="#calib3d.points.Point3D">Point3D</a></code> objects. The constructor supports multiple formats for creation
+of a single point or array of multiple points.</p>
+<p>Example with creation of <code><a title="calib3d.points.Point2D" href="#calib3d.points.Point2D">Point2D</a></code> objects, all formulations are equivalent:</p>
+<pre><code>&gt;&gt;&gt; x, y = 1, 2
+&gt;&gt;&gt; Point2D(x, y)
+&gt;&gt;&gt; Point2D(4*x, 4*y, 4)
+&gt;&gt;&gt; Point2D(np.array([[x], [y]]))
+&gt;&gt;&gt; Point2D(4*np.array([[x], [y], [1]]))
+Point2D([[1.],
+         [2.]])
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Point(HomogeneousCoordinatesPoint):
+    pass # easier type</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="calib3d.points.HomogeneousCoordinatesPoint" href="#calib3d.points.HomogeneousCoordinatesPoint">HomogeneousCoordinatesPoint</a></li>
+<li>numpy.ndarray</li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="calib3d.points.HomogeneousCoordinatesPoint" href="#calib3d.points.HomogeneousCoordinatesPoint">HomogeneousCoordinatesPoint</a></b></code>:
+<ul class="hlist">
+<li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.H" href="#calib3d.points.HomogeneousCoordinatesPoint.H">H</a></code></li>
+<li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.close" href="#calib3d.points.HomogeneousCoordinatesPoint.close">close</a></code></li>
+<li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.flatten" href="#calib3d.points.HomogeneousCoordinatesPoint.flatten">flatten</a></code></li>
+<li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.linspace" href="#calib3d.points.HomogeneousCoordinatesPoint.linspace">linspace</a></code></li>
+<li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.to_int_tuple" href="#calib3d.points.HomogeneousCoordinatesPoint.to_int_tuple">to_int_tuple</a></code></li>
+<li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.to_list" href="#calib3d.points.HomogeneousCoordinatesPoint.to_list">to_list</a></code></li>
+<li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.x" href="#calib3d.points.HomogeneousCoordinatesPoint.x">x</a></code></li>
+<li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.y" href="#calib3d.points.HomogeneousCoordinatesPoint.y">y</a></code></li>
+<li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.z" href="#calib3d.points.HomogeneousCoordinatesPoint.z">z</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 <dt id="calib3d.points.Point2D"><code class="flex name class">
 <span>class <span class="ident">Point2D</span></span>
@@ -768,6 +828,9 @@ coordinate). Only the <code>H</code> attribute should be used. Handle with care.
 <li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.y" href="#calib3d.points.HomogeneousCoordinatesPoint.y">y</a></code></li>
 <li><code><a title="calib3d.points.HomogeneousCoordinatesPoint.z" href="#calib3d.points.HomogeneousCoordinatesPoint.z">z</a></code></li>
 </ul>
+</li>
+<li>
+<h4><code><a title="calib3d.points.Point" href="#calib3d.points.Point">Point</a></code></h4>
 </li>
 <li>
 <h4><code><a title="calib3d.points.Point2D" href="#calib3d.points.Point2D">Point2D</a></code></h4>

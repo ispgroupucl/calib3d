@@ -150,7 +150,7 @@ are the radial distortion coefficients</li>
 <pre><code class="python">import pickle
 import numpy as np
 import cv2
-from .points import Point2D, Point3D
+from .points import Point2D, Point3D, HomogeneousCoordinatesPoint
 
 __doc__ = r&#34;&#34;&#34;
 
@@ -555,7 +555,6 @@ class Calib():
         return f&#34;Calib object ({self.width}×{self.height})@({self.C.x: 1.6g},{self.C.y: 1.6g},{self.C.z: 1.6g})&#34;
 
 
-
 def line_plane_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
     &#34;&#34;&#34; Finds the intersection between a line and a plane.
         Args:
@@ -571,6 +570,18 @@ def line_plane_intersection(C: Point3D, d, P: Point3D, n) -&gt; Point3D:
         return None
     dist = ((P-C).T @ n) / dot  # Distance between plane z=Z and camera
     return Point3D(C + dist.T*d)
+
+
+def point_line_distance(P, d, X) -&gt; float:
+    &#34;&#34;&#34; Finds the distance between a line and a point.
+        Args:
+            P (HomogeneousCoordinatesPoint): a point on the line
+            d (np.ndarray): the line direction-vector
+            X (HomogeneousCoordinatesPoint): a point.
+        Returns the distance between the line and the point.
+    &#34;&#34;&#34;
+    return np.linalg.norm(np.cross(d.flatten(), (P-X).flatten()))/np.linalg.norm(d)
+
 
 def compute_rotate(width, height, angle, degrees=True):
     &#34;&#34;&#34; Computes rotation matrix and new width and height for a rotation of angle degrees of a widthxheight image.
@@ -669,7 +680,23 @@ def compute_rotation_matrix(point3D: Point3D, camera3D: Point3D):
 
     # `O = R @ B` (where `O` := `np.identity(3)`)
     R = B.T # inv(B) == B.T since R is a rotation matrix
-    return R</code></pre>
+    return R
+
+
+def compute_shear_rectification_matrix(calib: Calib, point2D: Point2D):
+    &#34;&#34;&#34; Computes the transformation matrix that rectifies the image shear due to
+        projection in the image plane, at the point `point2D`.
+    &#34;&#34;&#34;
+    vector = Point2D(point2D.x - calib.K[0,2], point2D.y - calib.K[1,2])
+    R1 = np.eye(3)
+    R1[0:2,:] = cv2.getRotationMatrix2D(point2D.to_int_tuple(), np.arctan2(vector.y, vector.x)*180/np.pi, 1.0)
+    scale = np.cos(np.arctan(np.linalg.norm(vector)/calib.K[0,0]))
+    T1 = np.array([[1, 0, -point2D.x], [0, 1, -point2D.y], [0, 0, 1]])
+    S = np.array([[scale, 0, 0], [0, 1, 0], [0, 0, 1]])
+    R2 = np.eye(3)
+    R2[0:2,:] = cv2.getRotationMatrix2D((0, 0), -np.arctan2(vector.y, vector.x)*180/np.pi, 1.0)
+    T2 = np.array([[1, 0,  point2D.x], [0, 1,  point2D.y], [0, 0, 1]])
+    return T2@R2@S@T1@R1</code></pre>
 </details>
 </section>
 <section>
@@ -759,6 +786,32 @@ Credits: François Ledent</p></div>
     return R</code></pre>
 </details>
 </dd>
+<dt id="calib3d.calib.compute_shear_rectification_matrix"><code class="name flex">
+<span>def <span class="ident">compute_shear_rectification_matrix</span></span>(<span>calib: <a title="calib3d.calib.Calib" href="#calib3d.calib.Calib">Calib</a>, point2D: <a title="calib3d.points.Point2D" href="points.html#calib3d.points.Point2D">Point2D</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Computes the transformation matrix that rectifies the image shear due to
+projection in the image plane, at the point <code>point2D</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def compute_shear_rectification_matrix(calib: Calib, point2D: Point2D):
+    &#34;&#34;&#34; Computes the transformation matrix that rectifies the image shear due to
+        projection in the image plane, at the point `point2D`.
+    &#34;&#34;&#34;
+    vector = Point2D(point2D.x - calib.K[0,2], point2D.y - calib.K[1,2])
+    R1 = np.eye(3)
+    R1[0:2,:] = cv2.getRotationMatrix2D(point2D.to_int_tuple(), np.arctan2(vector.y, vector.x)*180/np.pi, 1.0)
+    scale = np.cos(np.arctan(np.linalg.norm(vector)/calib.K[0,0]))
+    T1 = np.array([[1, 0, -point2D.x], [0, 1, -point2D.y], [0, 0, 1]])
+    S = np.array([[scale, 0, 0], [0, 1, 0], [0, 0, 1]])
+    R2 = np.eye(3)
+    R2[0:2,:] = cv2.getRotationMatrix2D((0, 0), -np.arctan2(vector.y, vector.x)*180/np.pi, 1.0)
+    T2 = np.array([[1, 0,  point2D.x], [0, 1,  point2D.y], [0, 0, 1]])
+    return T2@R2@S@T1@R1</code></pre>
+</details>
+</dd>
 <dt id="calib3d.calib.line_plane_intersection"><code class="name flex">
 <span>def <span class="ident">line_plane_intersection</span></span>(<span>C: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>, d, P: <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a>, n) ‑> <a title="calib3d.points.Point3D" href="points.html#calib3d.points.Point3D">Point3D</a></span>
 </code></dt>
@@ -841,6 +894,36 @@ Credits: François Ledent</p></div>
     F = np.array([[f, 0, 0], [0, 1, 0], [0, 0, 1]])
 
     return S@C@R@F</code></pre>
+</details>
+</dd>
+<dt id="calib3d.calib.point_line_distance"><code class="name flex">
+<span>def <span class="ident">point_line_distance</span></span>(<span>P, d, X) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds the distance between a line and a point.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>P</code></strong> :&ensp;<code>HomogeneousCoordinatesPoint</code></dt>
+<dd>a point on the line</dd>
+<dt><strong><code>d</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>the line direction-vector</dd>
+<dt><strong><code>X</code></strong> :&ensp;<code>HomogeneousCoordinatesPoint</code></dt>
+<dd>a point.</dd>
+</dl>
+<p>Returns the distance between the line and the point.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def point_line_distance(P, d, X) -&gt; float:
+    &#34;&#34;&#34; Finds the distance between a line and a point.
+        Args:
+            P (HomogeneousCoordinatesPoint): a point on the line
+            d (np.ndarray): the line direction-vector
+            X (HomogeneousCoordinatesPoint): a point.
+        Returns the distance between the line and the point.
+    &#34;&#34;&#34;
+    return np.linalg.norm(np.cross(d.flatten(), (P-X).flatten()))/np.linalg.norm(d)</code></pre>
 </details>
 </dd>
 <dt id="calib3d.calib.rotate_image"><code class="name flex">
@@ -1664,8 +1747,10 @@ width and height and the given <code>output_width</code> and <code>output_height
 <ul class="">
 <li><code><a title="calib3d.calib.compute_rotate" href="#calib3d.calib.compute_rotate">compute_rotate</a></code></li>
 <li><code><a title="calib3d.calib.compute_rotation_matrix" href="#calib3d.calib.compute_rotation_matrix">compute_rotation_matrix</a></code></li>
+<li><code><a title="calib3d.calib.compute_shear_rectification_matrix" href="#calib3d.calib.compute_shear_rectification_matrix">compute_shear_rectification_matrix</a></code></li>
 <li><code><a title="calib3d.calib.line_plane_intersection" href="#calib3d.calib.line_plane_intersection">line_plane_intersection</a></code></li>
 <li><code><a title="calib3d.calib.parameters_to_affine_transform" href="#calib3d.calib.parameters_to_affine_transform">parameters_to_affine_transform</a></code></li>
+<li><code><a title="calib3d.calib.point_line_distance" href="#calib3d.calib.point_line_distance">point_line_distance</a></code></li>
 <li><code><a title="calib3d.calib.rotate_image" href="#calib3d.calib.rotate_image">rotate_image</a></code></li>
 </ul>
 </li>
