@@ -1,7 +1,7 @@
 import pickle
 import numpy as np
 import cv2
-from .points import Point2D, Point3D
+from .points import Point2D, Point3D, HomogeneousCoordinatesPoint
 
 __doc__ = r"""
 
@@ -406,7 +406,6 @@ class Calib():
         return f"Calib object ({self.width}×{self.height})@({self.C.x: 1.6g},{self.C.y: 1.6g},{self.C.z: 1.6g})"
 
 
-
 def line_plane_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
     """ Finds the intersection between a line and a plane.
         Args:
@@ -422,6 +421,18 @@ def line_plane_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
         return None
     dist = ((P-C).T @ n) / dot  # Distance between plane z=Z and camera
     return Point3D(C + dist.T*d)
+
+
+def point_line_distance(P, d, X) -> float:
+    """ Finds the distance between a line and a point.
+        Args:
+            P (HomogeneousCoordinatesPoint): a point on the line
+            d (np.ndarray): the line direction-vector
+            X (HomogeneousCoordinatesPoint): a point.
+        Returns the distance between the line and the point.
+    """
+    return np.linalg.norm(np.cross(d.flatten(), (P-X).flatten()))/np.linalg.norm(d)
+
 
 def compute_rotate(width, height, angle, degrees=True):
     """ Computes rotation matrix and new width and height for a rotation of angle degrees of a widthxheight image.
@@ -523,3 +534,17 @@ def compute_rotation_matrix(point3D: Point3D, camera3D: Point3D):
     return R
 
 
+def compute_shear_rectification_matrix(calib: Calib, point2D: Point2D):
+    """ Computes the transformation matrix that rectifies the image shear due to
+        projection in the image plane, at the point `point2D`.
+    """
+    vector = Point2D(point2D.x - calib.K[0,2], point2D.y - calib.K[1,2])
+    R1 = np.eye(3)
+    R1[0:2,:] = cv2.getRotationMatrix2D(point2D.to_int_tuple(), np.arctan2(vector.y, vector.x)*180/np.pi, 1.0)
+    scale = np.cos(np.arctan(np.linalg.norm(vector)/calib.K[0,0]))
+    T1 = np.array([[1, 0, -point2D.x], [0, 1, -point2D.y], [0, 0, 1]])
+    S = np.array([[scale, 0, 0], [0, 1, 0], [0, 0, 1]])
+    R2 = np.eye(3)
+    R2[0:2,:] = cv2.getRotationMatrix2D((0, 0), -np.arctan2(vector.y, vector.x)*180/np.pi, 1.0)
+    T2 = np.array([[1, 0,  point2D.x], [0, 1,  point2D.y], [0, 0, 1]])
+    return T2@R2@S@T1@R1
