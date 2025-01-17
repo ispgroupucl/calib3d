@@ -245,7 +245,7 @@ class Calib():
 
     def project_2D_to_3D(self, point2D: Point2D, X: float=None, Y: float=None, Z: float=None) -> Point3D:
         """ Using the calib object, project a 2D point in the 3D image space
-            given one of it's 3D coordinates (X,Y or Z). One and only one
+            given one of it's 3D coordinates (X, Y or Z). One and only one
             coordinate must be given.
             Args:
                 point2D (Point2D): the 2D point to be projected
@@ -256,13 +256,13 @@ class Calib():
                 The point in the 3D world that projects on `point2D` and for
                 which the given coordinates is given.
         """
-        v = [X,Y,Z]
-        assert sum([1 for x in v if x is None]) == 2
+        v = [X, Y, Z]
+        assert sum([x is not None for x in v]) == 1, "One and only one of X, Y, Z must be given"
         assert isinstance(point2D, Point2D), "Wrong argument type '{}'. Expected {}".format(type(point2D), Point2D)
         point2D = self.rectify(point2D)
         X = Point3D(self.Pinv @ point2D.H)
         d = (X - self.C)
-        P = np.nan_to_num(Point3D(*v), 0)
+        P = Point3D([0 if x is None else x for x in v])
         v = np.array([[0 if x is None else 1 for x in v]]).T
         return line_plane_intersection(self.C, d, P, v)
 
@@ -377,13 +377,12 @@ class Calib():
         length = np.linalg.norm(point3D_shifted_c - point3D_c, axis=0)
         return length
 
-
     def projects_in(self, point3D: Point3D) -> np.ndarray:
         """ Check wether point3D projects into the `Calib` object.
             Returns `True` where for points that projects in the image and `False` otherwise.
         """
         point2D = self.project_3D_to_2D(point3D)
-        cond = np.stack((point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width-1, point2D.y <= self.height-1))
+        cond = np.stack((point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width-1, point2D.y <= self.height-1, ~self.is_behind(point3D)))
         return np.all(cond, axis=0)
 
     def dist_to_border(self, point3D: Point3D) -> np.ndarray:
@@ -417,9 +416,12 @@ def line_plane_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
     """
     d = d/np.linalg.norm(d, axis=0)
     dot = d.T @ n
-    if np.any(np.abs(dot) < EPS):
-        return None
-    dist = ((P-C).T @ n) / dot  # Distance between plane z=Z and camera
+    with np.errstate(divide='ignore', invalid='ignore'):
+        dist = ((P-C).T @ n) / dot
+        dist[np.isinf(dist)] = np.nan
+    #if np.any(np.abs(dot) < EPS):
+    #    return None
+    #dist = ((P-C).T @ n) / dot  # Distance between plane z=Z and camera
     return Point3D(C + dist.T*d)
 
 
