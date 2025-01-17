@@ -119,7 +119,7 @@ Where:
 - \(t_1, t_2\) are the tangential distortion coefficients
 - \({r_u}^2 := {x_u}^2 + {y_u}^2\)
 
-We usually use only 3 radial distortion coefficients, which makes a total of 5 coefficients. Those coefficients are found by running an optimisation algorithm on a set of 2D point - 3D point relations as we did with `cv2.calibrateCamera`. They are stored in the `kc` vector.
+We usually use only 3 radial distortion coefficients, which makes a total of 5 coefficients. Those coefficients are found by running an optimisation algorithm on a set of 2D point - 3D point relations as we did with `cv2.calibrateCamera`. They are stored in the `k` vector.
 
 ### Inverse model: "rectify"
 
@@ -153,7 +153,7 @@ The method `project_3D_to_2D` allows to compute the position in the image of a 3
 EPS = 1e-5
 
 class Calib():
-    def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, kc=None, **_) -> None:
+    def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, k=None, **_) -> None:
         """ Represents a calibrated camera.
 
         Args:
@@ -162,13 +162,13 @@ class Calib():
             T (np.ndarray): translation vector
             R (np.ndarray): rotation matrix
             K (np.ndarray): camera matrix holding intrinsic parameters
-            kc (np.ndarray, optional): lens distortion coefficients. Defaults to None.
+            k (np.ndarray, optional): lens distortion coefficients. Defaults to None.
         """
-        self.width = int(width)
-        self.height = int(height)
+        self.w = self.width = int(width)
+        self.h = self.height = int(height)
         self.T = T
         self.K = K
-        self.kc = np.array((kc if kc is not None else [0,0,0,0,0]), dtype=np.float64)
+        self.k = np.array((k if k is not None else [0,0,0,0,0]), dtype=np.float64)
         self.R = R
         self.C = Point3D(-R.T@T)
         self.P = self.K @ np.hstack((self.R, self.T))
@@ -225,7 +225,7 @@ class Calib():
 
     def _project_3D_to_2D_cv2(self, point3D: Point3D):
         raise BaseException("This function gives errors when rotating the calibration...")
-        return Point2D(cv2.projectPoints(point3D, cv2.Rodrigues(self.R)[0], self.T, self.K, self.kc.astype(np.float64))[0][:,0,:].T)
+        return Point2D(cv2.projectPoints(point3D, cv2.Rodrigues(self.R)[0], self.T, self.K, self.k.astype(np.float64))[0][:,0,:].T)
 
     def project_3D_to_2D(self, point3D: Point3D) -> Point2D:
         """ Using the calib object, project a 3D point in the 2D image space.
@@ -269,8 +269,8 @@ class Calib():
     def distort(self, point2D: Point2D) -> Point2D:
         """ Applies lens distortions to the given `point2D`.
         """
-        if np.any(self.kc):
-            rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
+        if np.any(self.k):
+            rad1, rad2, tan1, tan2, rad3 = self.k.flatten()
             # Convert image coordinates to camera coordinates (with z=1 which is the projection plane)
             point2D = Point2D(self.Kinv @ point2D.H)
 
@@ -289,8 +289,8 @@ class Calib():
     def rectify(self, point2D: Point2D) -> Point2D:
         """ Removes lens distortion to the given `Point2D`.
         """
-        if np.any(self.kc):
-            rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
+        if np.any(self.k):
+            rad1, rad2, tan1, tan2, rad3 = self.k.flatten()
             point2D = Point2D(self.Kinv @ point2D.H) # to camera coordinates
 
             r2 = point2D.x*point2D.x + point2D.y*point2D.y
