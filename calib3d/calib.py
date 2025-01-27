@@ -2,6 +2,7 @@ import pickle
 import numpy as np
 import cv2
 from .points import Point2D, Point3D, HomogeneousCoordinatesPoint
+import warnings
 
 __doc__ = r"""
 
@@ -164,6 +165,9 @@ class Calib():
             K (np.ndarray): camera matrix holding intrinsic parameters
             k (np.ndarray, optional): lens distortion coefficients. Defaults to None.
         """
+        if 'kc' in _:
+            warnings.warn("The 'kc' argument is deprecated. Use 'k' instead.", Warning)
+            k = _['kc']
         self.w = self.width = int(width)
         self.h = self.height = int(height)
         self.T = T
@@ -400,7 +404,7 @@ class Calib():
             Returns `True` where for points that projects in the image and `False` otherwise.
         """
         point2D = self.project_3D_to_2D(point3D)
-        cond = np.stack((point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width-1, point2D.y <= self.height-1, ~self.is_behind(point3D)))
+        cond = (point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width-1, point2D.y <= self.height-1, np.squeeze(~self.is_behind(point3D)))
         return np.all(cond, axis=0)
 
     def dist_to_border(self, point3D: Point3D) -> np.ndarray:

@@ -10,7 +10,7 @@ R = np.array([[ 0.947337,   0.319065,  -0.0273947],
 T = np.array([[-2360.16 ],
               [ -123.465],
               [ 2793.1  ]])
-kc = np.array([-0.00865297, -0.0148287, -0.00078693, 0.00025515, 0.])
+k = np.array([-0.00865297, -0.0148287, -0.00078693, 0.00025515, 0.])
 width = 1936
 height = 1458
 
@@ -68,7 +68,7 @@ def test_constructorlist():
     assert np.all(points == Point3D([1,2,3,4,5], [2,3,4,5,6], [3,4,5,6,7]))
 
 def test_calib():
-    calib = Calib(K=K, R=R, kc=kc, T=T, width=width, height=height)
+    calib = Calib(K=K, R=R, k=k, T=T, width=width, height=height)
     assert calib
 
     assert np.all(calib.P - np.array([[ 2.928916572117e+03, 5.164948427700e+01, 3.569704477840e+02, -3.809875516500e+06],
@@ -86,7 +86,7 @@ def test_calib():
                                       [-1180.57158572]]) < EPS)
 
 def test_projection():
-    calib = Calib(K=K, R=R, kc=kc, T=T, width=width, height=height)
+    calib = Calib(K=K, R=R, k=k, T=T, width=width, height=height)
 
     # Single point
     point3D = Point3D(1400,750,0)
@@ -101,7 +101,7 @@ def test_projection():
     assert np.all(calib.project_2D_to_3D(points2D, Z=0) - points3D < 1.0e-2) # 0.01 cm error reprojection on image border
 
 def test_compute_length():
-    calib = Calib(K=K, R=R, kc=kc, T=T, width=width, height=height)
+    calib = Calib(K=K, R=R, k=k, T=T, width=width, height=height)
     point3D = Point3D(1400,750,0)
     margin3D = 100 #cm
     margin2D = calib.compute_length2D(point3D, margin3D)
@@ -109,6 +109,6 @@ def test_compute_length():
     assert margin2D[0] - 107.87859964 < EPS
 
 def test_project_X():
-    calib = Calib(K=K, R=R, kc=kc, T=T, width=width, height=height)
+    calib = Calib(K=K, R=R, k=k, T=T, width=width, height=height)
     point3D = Point3D(1400,750,0)
     assert np.all(calib.project_2D_to_3D(calib.project_3D_to_2D(point3D), X=1400) - point3D) < EPS
