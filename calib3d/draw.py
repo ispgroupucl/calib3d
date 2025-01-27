@@ -9,13 +9,13 @@ __doc__ = r"""
 
 When drawing 3D objets on a 2D canvas, several things need to be considered:
 - Projection onto the 2D space using the calibration information
-- Handling lens distortion that make straights lines appear curved
+- Handling lens distortion that make straight lines appear curved
 - Handling of objects visiblity given the canvas dimensions
 """
 
 class ProjectiveDrawer():
     """ Given the calibration information with `Calib`, and a number of segments
-        to decompose straights lines, this objet offer several functions to draw
+        to decompose straight lines, this objet offer several functions to draw
         on a 2D canvas given 3D coordinates.
     """
     def __init__(self, calib: Calib, color, thickness: int=1, segments: int=10):
@@ -24,15 +24,18 @@ class ProjectiveDrawer():
         self.calib = calib
         self.segments = segments
 
-    def _polylines(self, canvas, points: Point2D, color=None, thickness: int=None, **kwargs):
+    def _polylines(self, canvas, points: Point2D, color=None, thickness: int=None, markersize=None, **kwargs):
         thickness = thickness or self.thickness
         color = color or self.color
         if isinstance(canvas, np.ndarray):
-            points = points.astype(np.int32).T.reshape((-1,1,2))
+            points = np.array(points.astype(np.int32).T.reshape((-1,1,2)))
             if thickness < 0:
                 cv2.fillPoly(canvas, [points], color=color, **kwargs)
             else:
                 cv2.polylines(canvas, [points], False, color=color, thickness=thickness, **kwargs)
+            if markersize:
+                for point in points:
+                    cv2.drawMarker(canvas, tuple(point[0]), color=color, markerSize=markersize, thickness=thickness)
         else:
             if thickness < 0:
                 try:
@@ -42,10 +45,10 @@ class ProjectiveDrawer():
                 except ImportError:
                     raise ImportError("The current implementation requires matplotlib")
             else:
-                canvas.plot(points.x, points.y, linewidth=thickness, color=np.array(color)/255, **kwargs)
+                canvas.plot(points.x, points.y, linewidth=thickness, color=np.array(color)/255, markersize=markersize, **kwargs)
 
-    def polylines(self, canvas, points3D: Point3D, color=None, thickness: int=None, *args, **kwargs):
-        self._polylines(canvas, self.calib.project_3D_to_2D(points3D), thickness=thickness, *args, **kwargs)
+    def polylines(self, canvas, points3D: Point3D, color=None, thickness: int=None, **kwargs):
+        self._polylines(canvas, self.calib.project_3D_to_2D(points3D), color=color, thickness=thickness, **kwargs)
         #for point3D1, point3D2 in zip(points3D, points3D.close()[:,1:]):
         #    self.draw_line(canvas, point3D1, point3D2, *args, **kwargs)
 

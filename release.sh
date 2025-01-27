@@ -2,6 +2,8 @@
 
 # build documentation
 pdoc calib3d -o docs/ -c latex_math=True --force --html
+git add -u docs/
+git commit -m "Update documentation"
 
 # Extract version number from setup.py
 RELEASE_NUM=`grep version setup.py | cut -d\" -f2 | cut -d\' -f2`

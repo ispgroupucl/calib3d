@@ -1,7 +1,7 @@
 import pickle
 import numpy as np
 import cv2
-from .points import Point2D, Point3D
+from .points import Point2D, Point3D, HomogeneousCoordinatesPoint
 
 __doc__ = r"""
 
@@ -119,7 +119,7 @@ Where:
 - \(t_1, t_2\) are the tangential distortion coefficients
 - \({r_u}^2 := {x_u}^2 + {y_u}^2\)
 
-We usually use only 3 radial distortion coefficients, which makes a total of 5 coefficients. Those coefficients are found by running an optimisation algorithm on a set of 2D point - 3D point relations as we did with `cv2.calibrateCamera`. They are stored in the `kc` vector.
+We usually use only 3 radial distortion coefficients, which makes a total of 5 coefficients. Those coefficients are found by running an optimisation algorithm on a set of 2D point - 3D point relations as we did with `cv2.calibrateCamera`. They are stored in the `k` vector.
 
 ### Inverse model: "rectify"
 
@@ -153,7 +153,7 @@ The method `project_3D_to_2D` allows to compute the position in the image of a 3
 EPS = 1e-5
 
 class Calib():
-    def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, kc=None, **_) -> None:
+    def __init__(self, *, width: int, height: int, T: np.ndarray, R: np.ndarray, K: np.ndarray, k=None, **_) -> None:
         """ Represents a calibrated camera.
 
         Args:
@@ -162,13 +162,13 @@ class Calib():
             T (np.ndarray): translation vector
             R (np.ndarray): rotation matrix
             K (np.ndarray): camera matrix holding intrinsic parameters
-            kc (np.ndarray, optional): lens distortion coefficients. Defaults to None.
+            k (np.ndarray, optional): lens distortion coefficients. Defaults to None.
         """
-        self.width = int(width)
-        self.height = int(height)
+        self.w = self.width = int(width)
+        self.h = self.height = int(height)
         self.T = T
         self.K = K
-        self.kc = np.array((kc if kc is not None else [0,0,0,0,0]), dtype=np.float64)
+        self.k = np.array((k if k is not None else [0,0,0,0,0]), dtype=np.float64)
         self.R = R
         self.C = Point3D(-R.T@T)
         self.P = self.K @ np.hstack((self.R, self.T))
@@ -225,7 +225,7 @@ class Calib():
 
     def _project_3D_to_2D_cv2(self, point3D: Point3D):
         raise BaseException("This function gives errors when rotating the calibration...")
-        return Point2D(cv2.projectPoints(point3D, cv2.Rodrigues(self.R)[0], self.T, self.K, self.kc.astype(np.float64))[0][:,0,:].T)
+        return Point2D(cv2.projectPoints(point3D, cv2.Rodrigues(self.R)[0], self.T, self.K, self.k.astype(np.float64))[0][:,0,:].T)
 
     def project_3D_to_2D(self, point3D: Point3D) -> Point2D:
         """ Using the calib object, project a 3D point in the 2D image space.
@@ -245,7 +245,7 @@ class Calib():
 
     def project_2D_to_3D(self, point2D: Point2D, X: float=None, Y: float=None, Z: float=None) -> Point3D:
         """ Using the calib object, project a 2D point in the 3D image space
-            given one of it's 3D coordinates (X,Y or Z). One and only one
+            given one of it's 3D coordinates (X, Y or Z). One and only one
             coordinate must be given.
             Args:
                 point2D (Point2D): the 2D point to be projected
@@ -256,11 +256,11 @@ class Calib():
                 The point in the 3D world that projects on `point2D` and for
                 which the given coordinates is given.
         """
-        v = [X,Y,Z]
-        assert sum([1 for x in v if x is None]) == 2
+        v = [X, Y, Z]
+        assert sum([x is not None for x in v]) == 1, "One and only one of X, Y, Z must be given"
         assert isinstance(point2D, Point2D), "Wrong argument type '{}'. Expected {}".format(type(point2D), Point2D)
 
-        P = np.nan_to_num(Point3D(*v), 0)
+        P = Point3D([0 if x is None else x for x in v])
         v = np.array([[0 if x is None else 1 for x in v]]).T
         return self.project_2D_to_3D_plane(point2D, P, v)
 
@@ -287,8 +287,8 @@ class Calib():
     def distort(self, point2D: Point2D) -> Point2D:
         """ Applies lens distortions to the given `point2D`.
         """
-        if np.any(self.kc):
-            rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
+        if np.any(self.k):
+            rad1, rad2, tan1, tan2, rad3 = self.k.flatten()
             # Convert image coordinates to camera coordinates (with z=1 which is the projection plane)
             point2D = Point2D(self.Kinv @ point2D.H)
 
@@ -307,8 +307,8 @@ class Calib():
     def rectify(self, point2D: Point2D) -> Point2D:
         """ Removes lens distortion to the given `Point2D`.
         """
-        if np.any(self.kc):
-            rad1, rad2, tan1, tan2, rad3 = self.kc.flatten()
+        if np.any(self.k):
+            rad1, rad2, tan1, tan2, rad3 = self.k.flatten()
             point2D = Point2D(self.Kinv @ point2D.H) # to camera coordinates
 
             r2 = point2D.x*point2D.x + point2D.y*point2D.y
@@ -375,17 +375,32 @@ class Calib():
         """
         assert np.isscalar(length3D), f"This function expects a scalar `length3D` argument. Received {length3D}"
         point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
-        point3D_c.x += length3D # add the 3D length to one of the componant
+        orth = np.dot(point3D_c.flatten(), Point3D(point3D_c.x, point3D_c.y, 0).flatten())
+        orth = orth *length3D / np.linalg.norm(orth)
+        point3D_c.y += orth # add the 3D length orthogonally to the point in camera coordinates
         point2D = self.distort(Point2D(self.K @ point3D_c)) # go in the 2D world
         length = np.linalg.norm(point2D - self.project_3D_to_2D(point3D), axis=0)
         return length#float(length) if point3D.shape[1] == 1 else length
+
+    def compute_length3D(self, point3D: Point3D, length2D: float) -> np.ndarray:
+        """ Returns the (maximum) distance of the 3D point located `length2D` pixels away from `point3D` in the image plane.
+        """
+        assert np.isscalar(length2D), f"This function expects a scalar `length2D` argument. Received {length2D}"
+        point2D_shifted = self.project_3D_to_2D(point3D)
+        point2D_shifted.x += length2D
+        point2D_shifted = self.rectify(point2D_shifted)
+        point3D_shifted_c = Point3D(self.Kinv @ point2D_shifted.H)
+        point3D_c = Point3D(np.hstack((self.R, self.T)) @ point3D.H)  # Point3D expressed in camera coordinates system
+        point3D_shifted_c = point3D_shifted_c*point3D_c.z/point3D_shifted_c.z
+        length = np.linalg.norm(point3D_shifted_c - point3D_c, axis=0)
+        return length
 
     def projects_in(self, point3D: Point3D) -> np.ndarray:
         """ Check wether point3D projects into the `Calib` object.
             Returns `True` where for points that projects in the image and `False` otherwise.
         """
         point2D = self.project_3D_to_2D(point3D)
-        cond = np.stack((point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width-1, point2D.y <= self.height-1))
+        cond = np.stack((point2D.x >= 0, point2D.y >= 0, point2D.x <= self.width-1, point2D.y <= self.height-1, ~self.is_behind(point3D)))
         return np.all(cond, axis=0)
 
     def dist_to_border(self, point3D: Point3D) -> np.ndarray:
@@ -408,7 +423,6 @@ class Calib():
         return f"Calib object ({self.width}×{self.height})@({self.C.x: 1.6g},{self.C.y: 1.6g},{self.C.z: 1.6g})"
 
 
-
 def line_plane_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
     """ Finds the intersection between a line and a plane.
         Args:
@@ -420,10 +434,25 @@ def line_plane_intersection(C: Point3D, d, P: Point3D, n) -> Point3D:
     """
     d = d/np.linalg.norm(d, axis=0)
     dot = d.T @ n
-    if np.any(np.abs(dot) < EPS):
-        return None
-    dist = ((P-C).T @ n) / dot  # Distance between plane z=Z and camera
+    with np.errstate(divide='ignore', invalid='ignore'):
+        dist = ((P-C).T @ n) / dot
+        dist[np.isinf(dist)] = np.nan
+    #if np.any(np.abs(dot) < EPS):
+    #    return None
+    #dist = ((P-C).T @ n) / dot  # Distance between plane z=Z and camera
     return Point3D(C + dist.T*d)
+
+
+def point_line_distance(P, d, X) -> float:
+    """ Finds the distance between a line and a point.
+        Args:
+            P (HomogeneousCoordinatesPoint): a point on the line
+            d (np.ndarray): the line direction-vector
+            X (HomogeneousCoordinatesPoint): a point.
+        Returns the distance between the line and the point.
+    """
+    return np.linalg.norm(np.cross(d.flatten(), (P-X).flatten()))/np.linalg.norm(d)
+
 
 def compute_rotate(width, height, angle, degrees=True):
     """ Computes rotation matrix and new width and height for a rotation of angle degrees of a widthxheight image.
@@ -525,3 +554,17 @@ def compute_rotation_matrix(point3D: Point3D, camera3D: Point3D):
     return R
 
 
+def compute_shear_rectification_matrix(calib: Calib, point2D: Point2D):
+    """ Computes the transformation matrix that rectifies the image shear due to
+        projection in the image plane, at the point `point2D`.
+    """
+    vector = Point2D(point2D.x - calib.K[0,2], point2D.y - calib.K[1,2])
+    R1 = np.eye(3)
+    R1[0:2,:] = cv2.getRotationMatrix2D(point2D.to_int_tuple(), np.arctan2(vector.y, vector.x)*180/np.pi, 1.0)
+    scale = np.cos(np.arctan(np.linalg.norm(vector)/calib.K[0,0]))
+    T1 = np.array([[1, 0, -point2D.x], [0, 1, -point2D.y], [0, 0, 1]])
+    S = np.array([[scale, 0, 0], [0, 1, 0], [0, 0, 1]])
+    R2 = np.eye(3)
+    R2[0:2,:] = cv2.getRotationMatrix2D((0, 0), -np.arctan2(vector.y, vector.x)*180/np.pi, 1.0)
+    T2 = np.array([[1, 0,  point2D.x], [0, 1,  point2D.y], [0, 0, 1]])
+    return T2@R2@S@T1@R1

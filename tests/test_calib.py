@@ -106,7 +106,7 @@ def test_compute_length():
     margin3D = 100 #cm
     margin2D = calib.compute_length2D(point3D, margin3D)
     assert len(margin2D.shape) == 1
-    assert margin2D - 107.677886 < EPS
+    assert margin2D[0] - 107.87859964 < EPS
 
 def test_project_X():
     calib = Calib(K=K, R=R, kc=kc, T=T, width=width, height=height)
