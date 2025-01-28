@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # build documentation
-pdoc calib3d -o docs/ -c latex_math=True --force --html
+pdoc calib3d -o docs/ --math
 git add -u docs/
 git commit -m "Update documentation"
 

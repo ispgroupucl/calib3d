@@ -27,5 +27,6 @@ setup(
         "tensorflow": ["tensorflow>=2.4"],
         "pycuda": ["pycuda"],
         "matplotlib": ["matplotlib"],
+        "dev": ["pytest", "pytest-cov", "flake8", "black", "pdoc", "mock"]
     }
 )

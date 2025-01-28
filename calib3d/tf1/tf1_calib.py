@@ -1,6 +1,13 @@
 import cv2
-import tensorflow as tf
+try:
+    import tensorflow as tf
+except ImportError:
+    from mock import MagicMock
+    tf = MagicMock() # Mock it for pdoc
+    print("Tensorflow not installed, TensorflowCalib will not be available")
+
 from calib3d import Calib
+
 # pylint: disable=unexpected-keyword-arg, no-value-for-parameter, too-many-function-args
 
 class TensorflowCalib():
