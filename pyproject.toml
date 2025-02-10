@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "calib3d"
+version = "2.14.0"
+authors = [
+    {name = "Gabriel Van Zandycke", email = "gabriel.vanzandycke@hotmail.com"},
+]
+description = "Python 3D calibration and homogenous coordinates computation library"
+requires-python = ">=3.8.2"
+dependencies = [
+    "numpy>=1.22",
+    "opencv-python>=4.10",
+]
+readme = "README.md"
+license = {text = "LGPL"}
+urls.Homepage = "https://github.com/ispgroupucl/calib3d"
+
+[project.optional-dependencies]
+tensorflow = ["tensorflow>=2.4"]
+pycuda = ["pycuda"]
+matplotlib = ["matplotlib"]
+
+[tool.uv]
+dev-dependencies = ["pytest>=8.3", "pdoc3>=0.11"]
+
+[tool.ruff.lint]
+ignore = ["E731", "E741"]
+unfixable = []
