@@ -20,8 +20,8 @@ urls.Homepage = "https://github.com/ispgroupucl/calib3d"
 
 [project.optional-dependencies]
 tensorflow = ["tensorflow>=2.4"]
-pycuda = ["pycuda"]
-matplotlib = ["matplotlib"]
+pycuda = ["pycuda>=2024.1.2"]
+matplotlib = ["matplotlib>=3.9.3"]
 
 [tool.uv]
 dev-dependencies = ["pytest>=8.3", "pdoc3>=0.11"]
